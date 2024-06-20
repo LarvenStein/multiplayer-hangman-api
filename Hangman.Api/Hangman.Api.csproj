@@ -14,4 +14,11 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Hangman.Apllication\Hangman.Application.csproj" />
+    <ProjectReference Include="..\Hangman.Contracts\Hangman.Contracts.csproj" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties databasesettings_1json__JsonSchema="https://json.schemastore.org/appsettings.json" /></VisualStudio></ProjectExtensions>
+
 </Project>

@@ -5,6 +5,10 @@ VisualStudioVersion = 17.10.35004.147
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangman.Api", "Hangman.Api\Hangman.Api.csproj", "{038575EF-F8D3-4F38-9685-BBE671053C88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangman.Application", "Hangman.Apllication\Hangman.Application.csproj", "{7AAE4387-4043-48EE-83FD-7A44D81A44DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangman.Contracts", "Hangman.Contracts\Hangman.Contracts.csproj", "{8D946D6D-A72A-49F5-9D0B-A4DA850101D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{038575EF-F8D3-4F38-9685-BBE671053C88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{038575EF-F8D3-4F38-9685-BBE671053C88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{038575EF-F8D3-4F38-9685-BBE671053C88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AAE4387-4043-48EE-83FD-7A44D81A44DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AAE4387-4043-48EE-83FD-7A44D81A44DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AAE4387-4043-48EE-83FD-7A44D81A44DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AAE4387-4043-48EE-83FD-7A44D81A44DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D946D6D-A72A-49F5-9D0B-A4DA850101D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D946D6D-A72A-49F5-9D0B-A4DA850101D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D946D6D-A72A-49F5-9D0B-A4DA850101D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D946D6D-A72A-49F5-9D0B-A4DA850101D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
