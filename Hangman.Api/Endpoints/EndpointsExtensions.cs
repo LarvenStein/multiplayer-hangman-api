@@ -6,8 +6,10 @@
         {
             app.MapCreateGame();
             app.MapJoinGame();
+            app.MapEditGame();
             // POST /games - neues spiel
             // POST /games/:id/players - spiel beitreten
+            // PUT /games/:id - change room settings
             return app;
         }
     }

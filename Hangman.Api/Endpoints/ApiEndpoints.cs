@@ -7,5 +7,7 @@
         public const string CreateGame = $"{ApiBase}/games";
 
         public const string JoinGame = $"/{ApiBase}/games/{{roomCode}}/players";
+
+        public const string EditGame = $"{ApiBase}/games/{{roomCode}}";
     }
 }

@@ -30,6 +30,19 @@ namespace Hangman.Application.Repository
             return result > 0;
         }
 
+        public async Task<bool> EditGameAsync(GameSettings gameSettings, CancellationToken cancellationToken = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+
+            var result = await connection.ExecuteAsync(new CommandDefinition("""
+                UPDATE Game
+                SET GameLeader = (@gameLeader), Rounds = (@rounds), MaxPlayers = (@maxPlayers), WordList = (@wordList)
+                WHERE RoomCode = (@roomCode)
+                """, gameSettings, cancellationToken: cancellationToken));
+
+            return result > 0;
+        }
+
         public async Task<Guid?> GetGameLeader(string gameCode, CancellationToken cancellationToken = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);

@@ -1,6 +1,7 @@
 using Hangman.Application;
 using Hangman.Application.Database;
 using Hangman.Api.Endpoints;
+using Hangman.Api.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("databasesettings.json");
@@ -33,6 +34,8 @@ app.UseHttpsRedirection();
 
 //app.UseAuthorization();
 app.MapApiEndpoints();
+
+app.UseMiddleware<ValidationMappingMiddleware>();
 //app.MapControllers();
 
 var dbInitializer = app.Services.GetRequiredService<DbInitializer>();

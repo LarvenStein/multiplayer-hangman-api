@@ -4,6 +4,8 @@ using Hangman.Application.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
@@ -14,11 +16,13 @@ namespace Hangman.Application.Services
     {
         private readonly IGameReopsitory _gameReopsitory;
         private readonly IValidator<Player> _playerValidator;
+        private readonly IValidator<GameSettings> _gameSettingsValidator;
 
-        public GameService(IGameReopsitory gameReopsitory, IValidator<Player> playerValidator)
+        public GameService(IGameReopsitory gameReopsitory, IValidator<Player> playerValidator, IValidator<GameSettings> settingsValidator)
         {
             _gameReopsitory = gameReopsitory;
             _playerValidator = playerValidator;
+            _gameSettingsValidator = settingsValidator;
         }
 
         public async Task<string?> CreateGameAsync(CancellationToken token = default)
@@ -46,7 +50,6 @@ namespace Hangman.Application.Services
 
         public async Task<bool> JoinGameAsync(Player player, CancellationToken token = default)
         {
-            Console.WriteLine(player.roomCode);
             await _playerValidator.ValidateAndThrowAsync(player, cancellationToken: token);
             
             var gameLeader = await _gameReopsitory.GetGameLeader(player.roomCode);
@@ -59,7 +62,14 @@ namespace Hangman.Application.Services
             return await _gameReopsitory.JoinGameAsync(player, token);
         }
 
+        public async Task<bool> EditGameAsync(GameSettings gameSettings, Guid userId, CancellationToken token = default)
+        {
+            await _gameSettingsValidator.ValidateAndThrowAsync(gameSettings, cancellationToken: token);
 
+            var result = await _gameReopsitory.EditGameAsync(gameSettings, cancellationToken: token);
+
+            return result;
+        }
 
         private static Random random = new Random();
         private static string RandomString(int length)
@@ -67,6 +77,12 @@ namespace Hangman.Application.Services
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public async Task<bool> IsUserGameLeader(GameSettings gameSettings, Guid userId, CancellationToken token = default)
+        {
+            var gameLeader = await _gameReopsitory.GetGameLeader(gameSettings.roomCode, token);
+            return gameSettings.gameLeader == gameLeader;
         }
     }
 }

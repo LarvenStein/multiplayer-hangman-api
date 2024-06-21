@@ -13,5 +13,6 @@ namespace Hangman.Application.Repository
         Task<bool> JoinGameAsync(Player player, CancellationToken token = default);
         Task<Guid?> GetGameLeader(String gameCode, CancellationToken cancellationToken = default);
         Task<bool> SetGameLeader(Player player, CancellationToken cancellationToken = default);
+        Task<bool> EditGameAsync(GameSettings gameSettings, CancellationToken cancellationToken = default);
     }
 }

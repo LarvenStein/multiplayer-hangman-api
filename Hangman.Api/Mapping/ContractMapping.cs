@@ -2,6 +2,7 @@
 using Hangman.Contracts.Requests;
 using Hangman.Contracts.Responses;
 using System.Runtime.CompilerServices;
+using Hangman.Application.Services;
 
 namespace Hangman.Api.Mapping
 {
@@ -26,5 +27,28 @@ namespace Hangman.Api.Mapping
                 roomCode = player.roomCode,
             };
         }
+
+        public static EditGameResponse MapToResponse(this GameSettings gameSettings)
+        {
+            return new EditGameResponse
+            {
+                rounds = gameSettings.rounds,
+                maxPlayers = gameSettings.maxPlayers,
+                wordList = gameSettings.wordList,
+            };
+        }
+
+        public static GameSettings MapToGameSettings(this EditGameRequest request, String roomCode)
+        {
+            return new GameSettings
+            {
+                rounds = request.rounds,
+                maxPlayers = request.maxPlayers,
+                gameLeader = request.newGameLeader,
+                wordList = request.wordList,
+                roomCode = roomCode
+            };
+        }
+
     }
 }
