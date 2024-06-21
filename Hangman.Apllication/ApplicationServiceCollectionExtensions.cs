@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Hangman.Application.Database;
 using Hangman.Application.Repository;
 using Hangman.Application.Services;
+using FluentValidation;
 
 namespace Hangman.Application
 {
@@ -16,6 +17,7 @@ namespace Hangman.Application
         {
             services.AddSingleton<IGameReopsitory, GameRepository>();
             services.AddSingleton<IGameService, GameService>();
+            services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
             return services;
         }
 

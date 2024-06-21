@@ -1,20 +1,24 @@
-﻿using Hangman.Application.Models;
+﻿using FluentValidation;
+using Hangman.Application.Models;
 using Hangman.Application.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace Hangman.Application.Services
 {
     public class GameService : IGameService
     {
         private readonly IGameReopsitory _gameReopsitory;
+        private readonly IValidator<Player> _playerValidator;
 
-        public GameService(IGameReopsitory gameReopsitory)
+        public GameService(IGameReopsitory gameReopsitory, IValidator<Player> playerValidator)
         {
             _gameReopsitory = gameReopsitory;
+            _playerValidator = playerValidator;
         }
 
         public async Task<string?> CreateGameAsync(CancellationToken token = default)
@@ -42,7 +46,16 @@ namespace Hangman.Application.Services
 
         public async Task<bool> JoinGameAsync(Player player, CancellationToken token = default)
         {
-            // TODO: Validation
+            Console.WriteLine(player.roomCode);
+            await _playerValidator.ValidateAndThrowAsync(player, cancellationToken: token);
+            
+            var gameLeader = await _gameReopsitory.GetGameLeader(player.roomCode);
+
+            if (gameLeader == null)
+            {
+                await _gameReopsitory.SetGameLeader(player, cancellationToken: token);
+            }
+            
             return await _gameReopsitory.JoinGameAsync(player, token);
         }
 

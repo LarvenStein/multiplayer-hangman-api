@@ -13,7 +13,7 @@ namespace Hangman.Api.Endpoints
         public static IEndpointRouteBuilder MapJoinGame(this IEndpointRouteBuilder app)
         {
             app.MapPost(ApiEndpoints.JoinGame, async (
-                string roomCode, 
+                [FromRoute] string roomCode, 
                 IGameService gameService, 
                 CancellationToken token, 
                 [FromBody] JoinGameRequest request) =>
