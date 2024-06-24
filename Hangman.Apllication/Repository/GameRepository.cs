@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Hangman.Application.Database;
@@ -52,6 +53,17 @@ namespace Hangman.Application.Repository
                 WHERE RoomCode = @gameCode
                 """, new { gameCode }, cancellationToken: cancellationToken));
 
+            return result;
+        }
+
+        public async Task<string?> GetUserGame(string userId)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+            var result = await connection.QuerySingleAsync<string?>(new CommandDefinition("""
+                SELECT RoomCode
+                FROM Player
+                WHERE PlayerId = @userId
+                """, new { userId }));
             return result;
         }
 

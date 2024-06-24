@@ -32,6 +32,26 @@ namespace Hangman.Api.Mapping
 
                 await context.Response.WriteAsJsonAsync(validationFailureResponse);
             }
+            catch (Exception ex)
+            {
+                string[] exContents = ex.Message.Split(";");
+                int exContentsMessageIndex = 1;
+                if(Int32.TryParse(exContents[0], out int statusCode))
+                {
+                    context.Response.StatusCode = statusCode;
+                } else
+                {
+                    context.Response.StatusCode = 500;
+                    exContentsMessageIndex = 0;
+
+                }
+
+                var failureResponse = new OtherFailureResponse
+                {
+                    message = exContents[exContentsMessageIndex]
+                };
+                await context.Response.WriteAsJsonAsync(failureResponse);
+            }
         }
 
 

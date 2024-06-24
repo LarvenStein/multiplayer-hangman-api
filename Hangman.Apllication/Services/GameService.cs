@@ -66,6 +66,11 @@ namespace Hangman.Application.Services
         {
             await _gameSettingsValidator.ValidateAndThrowAsync(gameSettings, cancellationToken: token);
 
+            if(await _gameReopsitory.GetGameLeader(gameSettings.roomCode, token) != userId)
+            {
+                throw new Exception("401;Unauthorized");
+            }
+
             var result = await _gameReopsitory.EditGameAsync(gameSettings, cancellationToken: token);
 
             return result;
@@ -83,6 +88,14 @@ namespace Hangman.Application.Services
         {
             var gameLeader = await _gameReopsitory.GetGameLeader(gameSettings.roomCode, token);
             return gameSettings.gameLeader == gameLeader;
+        }
+
+        public async Task<bool> IsUserInGame(string roomCode, string userId)
+        {
+            var userGameId = await _gameReopsitory.GetUserGame(userId);
+            return (userGameId is not null && userGameId != roomCode);
+           
+                
         }
     }
 }

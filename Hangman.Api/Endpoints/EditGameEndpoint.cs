@@ -1,6 +1,7 @@
 ﻿using Hangman.Api.Mapping;
 using Hangman.Application.Services;
 using Hangman.Contracts.Requests;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hangman.Api.Endpoints
@@ -21,7 +22,7 @@ namespace Hangman.Api.Endpoints
                 var gameSettings = request.MapToGameSettings(roomCode);
 
                 var auth = await gameService.EditGameAsync(gameSettings, userId, token);
-
+                
                 var result = gameSettings.MapToResponse();
 
                 return TypedResults.Ok(result);
