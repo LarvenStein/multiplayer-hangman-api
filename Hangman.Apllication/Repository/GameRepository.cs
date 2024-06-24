@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Hangman.Application.Database;
 using Hangman.Application.Models;
+using MySqlX.XDevAPI.Common;
 
 namespace Hangman.Application.Repository
 {
@@ -56,6 +57,31 @@ namespace Hangman.Application.Repository
 
             return roundNum;
 
+        }
+
+        public async Task<GameStatus> GetGame(string gameCode, CancellationToken token = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
+            var result = await connection.QuerySingleAsync<GameStatus>(new CommandDefinition("""
+                SELECT game.RoomCode, 
+                        game.MaxPlayers, 
+                        game.Rounds, 
+                        wordlist.name AS Wordlist, 
+                        (SELECT CASE 
+                            WHEN COUNT(*) = 0 THEN 'Lobby'
+                            -- TODO: Put something here for maxrounds + 1
+                            ELSE 'playing'
+                        END AS Status
+                        FROM Round
+                        WHERE RoomCode = (@gameCode)) AS status,
+                        (SElECT COUNT(*)
+                        FROM round
+                        WHERE RoomCode = (@gameCode)) AS round
+                FROM game INNER JOIN wordlist
+                ON game.WordList = wordlist.WordlistId
+                WHERE game.roomCode = (@gameCode)
+                """, new {gameCode}, cancellationToken: token));
+            return result;
         }
 
         public async Task<Guid?> GetGameLeader(string gameCode, CancellationToken cancellationToken = default)

@@ -126,5 +126,20 @@ namespace Hangman.Application.Services
 
             return await _gameReopsitory.NextRoundAsync(roomCode, word, token);
         }
+
+        public async Task<GameStatus> GetGameStatus(string roomCode, Guid userId, CancellationToken token = default)
+        {
+            var userGameCode = await _gameReopsitory.GetUserGame(userId);
+            // Validation
+            if (!Regex.IsMatch(roomCode, @"(^[A-Za-z0-9]+$)") || roomCode.Length != 6)
+            {
+                throw new ValidationException("Invalid room code");
+            }
+            if (userGameCode != roomCode)
+            {
+                throw new Exception("401;Unauthorized");
+            }
+            return await _gameReopsitory.GetGame(roomCode, token);
+        }
     }
 }

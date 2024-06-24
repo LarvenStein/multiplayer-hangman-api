@@ -26,7 +26,6 @@ namespace Hangman.Application.Database
                 MaxPlayers TINYINT not null DEFAULT 5,
                 Rounds TINYINT not null DEFAULT 5,
                 WordList INT not null DEFAULT 1,
-                Round TINYINT not null DEFAULT 0,
                 GameLeader CHAR(36))
                 """);
 

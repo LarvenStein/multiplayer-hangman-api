@@ -18,5 +18,6 @@ namespace Hangman.Application.Repository
         Task<int> NextRoundAsync(String gameCode, string word, CancellationToken cancellationToken = default);
         Task<string> GetWordList(String gameCode, CancellationToken cancellationToken = default);
         Task<int> GetCurrentRound(String gameCode, CancellationToken cancellationToken = default);
+        Task<GameStatus> GetGame(String gameCode, CancellationToken token = default);
     }
 }

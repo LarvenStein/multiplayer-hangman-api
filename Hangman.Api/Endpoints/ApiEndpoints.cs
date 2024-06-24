@@ -11,5 +11,8 @@
         public const string EditGame = $"{ApiBase}/games/{{roomCode}}";
 
         public const string StartGame = $"{ApiBase}/games/{{roomCode}}";
+
+        public const string GameStatus = $"{ApiBase}/games/{{roomCode}}";
+
     }
 }
