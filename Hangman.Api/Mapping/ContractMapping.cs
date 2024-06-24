@@ -50,5 +50,13 @@ namespace Hangman.Api.Mapping
             };
         }
 
+        public static StartGameResponse MapToResponse(this int roundId)
+        {
+            return new StartGameResponse
+            {
+                RoundId = roundId,
+            };
+        }
+
     }
 }

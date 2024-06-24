@@ -1,4 +1,5 @@
-﻿using Hangman.Application.Services;
+﻿using Hangman.Api.Mapping;
+using Hangman.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hangman.Api.Endpoints
@@ -15,7 +16,7 @@ namespace Hangman.Api.Endpoints
                 [FromHeader(Name = "x-user-id")] Guid userId) =>
             {
                 var result = await gameService.NextRoundAsync(roomCode, userId, true);
-                return TypedResults.CreatedAtRoute(result);
+                return TypedResults.Ok(result.MapToResponse());
             });
             return app;
         }
