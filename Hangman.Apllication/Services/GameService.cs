@@ -1,12 +1,15 @@
 ﻿using FluentValidation;
 using Hangman.Application.Models;
 using Hangman.Application.Repository;
+using Hangman.Application.Validators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Numerics;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
@@ -90,12 +93,38 @@ namespace Hangman.Application.Services
             return gameSettings.gameLeader == gameLeader;
         }
 
-        public async Task<bool> IsUserInGame(string roomCode, string userId)
+        public async Task<bool> IsUserInGame(string roomCode, Guid userId)
         {
             var userGameId = await _gameReopsitory.GetUserGame(userId);
             return (userGameId is not null && userGameId != roomCode);
            
                 
+        }
+
+        public async Task<int> NextRoundAsync(string roomCode, Guid userId, bool start, CancellationToken token = default)
+        {
+            // Validation
+            if (!Regex.IsMatch(roomCode, @"(^[A-Za-z0-9]+$)") || roomCode.Length != 6)
+            {
+                throw new ValidationException("Invalid room code");
+            }
+            if (await _gameReopsitory.GetGameLeader(roomCode, token) != userId)
+            {
+                throw new Exception("401;Unauthorized");
+            }
+            if(await _gameReopsitory.GetCurrentRound(roomCode, token) > 0 && start)
+            {
+                throw new Exception("409;Game already started");
+            }
+
+            // Get word from wordlist
+            string wlUrl = await _gameReopsitory.GetWordList(roomCode);
+            HttpClient client = new HttpClient();
+            string rawWordList = await client.GetStringAsync(wlUrl);
+            var wordList = rawWordList.Split(Environment.NewLine);
+            string word = wordList[random.Next(0, wordList.Length - 1)];
+
+            return await _gameReopsitory.NextRoundAsync(roomCode, word, token);
         }
     }
 }

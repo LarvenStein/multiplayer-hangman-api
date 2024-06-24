@@ -26,6 +26,7 @@ namespace Hangman.Application.Database
                 MaxPlayers TINYINT not null DEFAULT 5,
                 Rounds TINYINT not null DEFAULT 5,
                 WordList INT not null DEFAULT 1,
+                Round TINYINT not null DEFAULT 0,
                 GameLeader CHAR(36))
                 """);
 
@@ -41,11 +42,12 @@ namespace Hangman.Application.Database
             // Creating the round table
             await connection.ExecuteAsync("""
                 CREATE TABLE IF NOT EXISTS Round (
-                RoundId CHAR(36) primary key,
                 Word TINYTEXT not null,
                 RoundNum TINYINT not null,
-                Status TINYTEXT not null,
-                RoomCode CHAR(6) not null)
+                Status TINYTEXT not null DEFAULT "active",
+                RoomCode CHAR(6) not null,
+                PRIMARY KEY (RoundNum, RoomCode)
+                )
                 """);
 
             // Creating the guesses table

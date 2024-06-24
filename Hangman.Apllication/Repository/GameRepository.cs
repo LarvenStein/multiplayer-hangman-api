@@ -44,6 +44,20 @@ namespace Hangman.Application.Repository
             return result > 0;
         }
 
+        public async Task<int> GetCurrentRound(string gameCode, CancellationToken cancellationToken = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+            int roundNum = 0;
+            roundNum += await connection.QuerySingleAsync<int>(new CommandDefinition("""
+                SElECT COUNT(*)
+                FROM round
+                WHERE RoomCode = (@gameCode)
+                """, new { gameCode }, cancellationToken: cancellationToken));
+
+            return roundNum;
+
+        }
+
         public async Task<Guid?> GetGameLeader(string gameCode, CancellationToken cancellationToken = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
@@ -56,7 +70,7 @@ namespace Hangman.Application.Repository
             return result;
         }
 
-        public async Task<string?> GetUserGame(string userId)
+        public async Task<string?> GetUserGame(Guid userId)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync();
             var result = await connection.QuerySingleAsync<string?>(new CommandDefinition("""
@@ -67,9 +81,22 @@ namespace Hangman.Application.Repository
             return result;
         }
 
+        public async Task<string> GetWordList(string gameCode, CancellationToken cancellationToken = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+            var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
+                SELECT wordlist.Path
+                FROM game INNER JOIN wordlist
+                ON game.WordList = wordlist.WordlistId
+                WHERE game.Roomcode = (@gameCode)
+                """, new { gameCode }, cancellationToken: cancellationToken));
+            return result;
+        }
+
         public async Task<bool> JoinGameAsync(Player player, CancellationToken token = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
+
 
             var result = await connection.ExecuteAsync(new CommandDefinition("""
                 INSERT INTO Player
@@ -77,6 +104,25 @@ namespace Hangman.Application.Repository
                 """, player, cancellationToken: token));
 
             return result > 0;
+        }
+
+        public async Task<int> NextRoundAsync(string gameCode, string word, CancellationToken token = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
+            int roundNum = 0;
+            roundNum += await GetCurrentRound(gameCode, token);
+
+            roundNum++;
+
+            var result = await connection.ExecuteAsync(new CommandDefinition("""
+                INSERT INTO round (Word, RoundNum, RoomCode)
+                VALUES (@word, @roundNum, @gameCode)
+
+                """, new {gameCode, word, roundNum}, cancellationToken: token));
+            
+            if (result < 0) { }
+
+            return roundNum;
         }
 
         public async Task<bool> SetGameLeader(Player player, CancellationToken token = default)
