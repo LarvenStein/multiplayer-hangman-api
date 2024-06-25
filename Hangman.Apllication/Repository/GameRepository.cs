@@ -45,6 +45,18 @@ namespace Hangman.Application.Repository
             return result > 0;
         }
 
+        public async Task<IEnumerable<string>> GetAllPlayers(string roomCode, CancellationToken token = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
+            var result = await connection.QueryAsync<string>(new CommandDefinition("""
+                SELECT Name
+                FROM player
+                WHERE RoomCode = (@roomCode)
+                """, new { roomCode }, cancellationToken: token));
+
+            return result;
+        }
+
         public async Task<int> GetCurrentRound(string gameCode, CancellationToken cancellationToken = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);

@@ -14,5 +14,7 @@
 
         public const string GameStatus = $"{ApiBase}/games/{{roomCode}}";
 
+        public const string GetPlayers = $"/{ApiBase}/games/{{roomCode}}/players";
+
     }
 }

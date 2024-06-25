@@ -20,7 +20,13 @@ namespace Hangman.Application.Services
         public async Task<bool> IsUserGameLeader(GameSettings gameSettings, Guid userId, CancellationToken token = default)
         {
             var gameLeader = await _gameReopsitory.GetGameLeader(gameSettings.roomCode, token);
-            return gameSettings.gameLeader == gameLeader;
+            return userId == gameLeader;
+        }
+
+        public async Task<bool> IsUserGameLeader(String roomCode, Guid userId, CancellationToken token = default)
+        {
+            var gameLeader = await _gameReopsitory.GetGameLeader(roomCode, token);
+            return userId == gameLeader;
         }
 
         public async Task<bool> IsUserInGame(string roomCode, Guid userId)

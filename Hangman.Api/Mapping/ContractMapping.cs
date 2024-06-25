@@ -71,5 +71,14 @@ namespace Hangman.Api.Mapping
 
             };
         }
+
+        public static GetPlayersResponse MapToResponse(this IEnumerable<string> players, bool gameLeader)
+        {
+            return new GetPlayersResponse
+            {
+                players = players,
+                isPlayerGameLeader = gameLeader
+            };
+        }
     }
 }

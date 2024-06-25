@@ -19,5 +19,7 @@ namespace Hangman.Application.Repository
         Task<string> GetWordList(String gameCode, CancellationToken cancellationToken = default);
         Task<int> GetCurrentRound(String gameCode, CancellationToken cancellationToken = default);
         Task<GameStatus> GetGame(String gameCode, CancellationToken token = default);
+        Task<IEnumerable<string>> GetAllPlayers(string roomCode, CancellationToken token = default);
+
     }
 }

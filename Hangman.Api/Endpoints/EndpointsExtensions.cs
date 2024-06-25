@@ -9,9 +9,7 @@
             app.MapEditGame();
             app.MapStartGame();
             app.MapGetGameStatus();
-            // POST /games - neues spiel
-            // POST /games/:id/players - spiel beitreten
-            // PUT /games/:id - change room settings
+            app.MapGetPlayers();
             return app;
         }
     }
