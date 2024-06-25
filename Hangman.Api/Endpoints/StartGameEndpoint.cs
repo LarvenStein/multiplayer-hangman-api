@@ -11,11 +11,11 @@ namespace Hangman.Api.Endpoints
         {
             app.MapPost(ApiEndpoints.StartGame, async (
                 [FromRoute] string roomCode,
-                IGameService gameService,
+                IGameStateService gameStateService,
                 CancellationToken token,
                 [FromHeader(Name = "x-user-id")] Guid userId) =>
             {
-                var result = await gameService.NextRoundAsync(roomCode, userId, true);
+                var result = await gameStateService.NextRoundAsync(roomCode, userId, true);
                 return TypedResults.Ok(result.MapToResponse());
             });
             return app;

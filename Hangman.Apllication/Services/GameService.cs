@@ -40,7 +40,8 @@ namespace Hangman.Application.Services
                 {
                     throw new Exception("Game could not be created");
                 };
-                roomCode = RandomString(6);
+                var randomService = new RandomService();
+                roomCode = randomService.RandomString(6);
                 try
                 {
                     result = await _gameReopsitory.CreateGameAsync(roomCode, token);
@@ -79,67 +80,5 @@ namespace Hangman.Application.Services
             return result;
         }
 
-        private static Random random = new Random();
-        private static string RandomString(int length)
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
-        public async Task<bool> IsUserGameLeader(GameSettings gameSettings, Guid userId, CancellationToken token = default)
-        {
-            var gameLeader = await _gameReopsitory.GetGameLeader(gameSettings.roomCode, token);
-            return gameSettings.gameLeader == gameLeader;
-        }
-
-        public async Task<bool> IsUserInGame(string roomCode, Guid userId)
-        {
-            var userGameId = await _gameReopsitory.GetUserGame(userId);
-            return (userGameId is not null && userGameId != roomCode);
-           
-                
-        }
-
-        public async Task<int> NextRoundAsync(string roomCode, Guid userId, bool start, CancellationToken token = default)
-        {
-            // Validation
-            if (!Regex.IsMatch(roomCode, @"(^[A-Za-z0-9]+$)") || roomCode.Length != 6)
-            {
-                throw new ValidationException("Invalid room code");
-            }
-            if (await _gameReopsitory.GetGameLeader(roomCode, token) != userId)
-            {
-                throw new Exception("401;Unauthorized");
-            }
-            if(await _gameReopsitory.GetCurrentRound(roomCode, token) > 0 && start)
-            {
-                throw new Exception("409;Game already started");
-            }
-
-            // Get word from wordlist
-            string wlUrl = await _gameReopsitory.GetWordList(roomCode);
-            HttpClient client = new HttpClient();
-            string rawWordList = await client.GetStringAsync(wlUrl);
-            var wordList = rawWordList.Split(Environment.NewLine);
-            string word = wordList[random.Next(0, wordList.Length - 1)];
-
-            return await _gameReopsitory.NextRoundAsync(roomCode, word, token);
-        }
-
-        public async Task<GameStatus> GetGameStatus(string roomCode, Guid userId, CancellationToken token = default)
-        {
-            var userGameCode = await _gameReopsitory.GetUserGame(userId);
-            // Validation
-            if (!Regex.IsMatch(roomCode, @"(^[A-Za-z0-9]+$)") || roomCode.Length != 6)
-            {
-                throw new ValidationException("Invalid room code");
-            }
-            if (userGameCode != roomCode)
-            {
-                throw new Exception("401;Unauthorized");
-            }
-            return await _gameReopsitory.GetGame(roomCode, token);
-        }
     }
 }
