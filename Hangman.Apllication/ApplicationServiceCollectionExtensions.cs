@@ -19,7 +19,9 @@ namespace Hangman.Application
             services.AddSingleton<IGameService, GameService>();
             services.AddSingleton<IRandomService, RandomService>();
             services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IUserRepository, UserRepository>();
             services.AddSingleton<IGameStateService, GameStateService>();
+            services.AddSingleton<IGameStateRepository, GameStateRepository>();
             services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
             return services;
         }

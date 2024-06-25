@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hangman.Application.Services
 {
-    internal interface IRandomService
+    public interface IRandomService
     {
         string RandomString(int length);
     }

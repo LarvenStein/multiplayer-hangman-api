@@ -10,28 +10,28 @@ namespace Hangman.Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly IGameReopsitory _gameReopsitory;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(IGameReopsitory gameReopsitory)
+        public UserService(IUserRepository userRepository)
         {
-            _gameReopsitory = gameReopsitory;
+            _userRepository = userRepository;
         }
 
         public async Task<bool> IsUserGameLeader(GameSettings gameSettings, Guid userId, CancellationToken token = default)
         {
-            var gameLeader = await _gameReopsitory.GetGameLeader(gameSettings.roomCode, token);
+            var gameLeader = await _userRepository.GetGameLeader(gameSettings.roomCode, token);
             return userId == gameLeader;
         }
 
         public async Task<bool> IsUserGameLeader(String roomCode, Guid userId, CancellationToken token = default)
         {
-            var gameLeader = await _gameReopsitory.GetGameLeader(roomCode, token);
+            var gameLeader = await _userRepository.GetGameLeader(roomCode, token);
             return userId == gameLeader;
         }
 
         public async Task<bool> IsUserInGame(string roomCode, Guid userId)
         {
-            var userGameId = await _gameReopsitory.GetUserGame(userId);
+            var userGameId = await _userRepository.GetUserGame(userId);
             return (userGameId is not null && userGameId != roomCode);
         }
     }

@@ -18,12 +18,16 @@ namespace Hangman.Application.Services
     public class GameService : IGameService
     {
         private readonly IGameReopsitory _gameReopsitory;
+        private readonly IUserRepository _userRepository;
+        private readonly IRandomService _randomService;
         private readonly IValidator<Player> _playerValidator;
         private readonly IValidator<GameSettings> _gameSettingsValidator;
 
-        public GameService(IGameReopsitory gameReopsitory, IValidator<Player> playerValidator, IValidator<GameSettings> settingsValidator)
+        public GameService(IGameReopsitory gameReopsitory, IUserRepository userRepository, IValidator<Player> playerValidator, IValidator<GameSettings> settingsValidator, IRandomService randomService)
         {
             _gameReopsitory = gameReopsitory;
+            _userRepository = userRepository;
+            _randomService = randomService;
             _playerValidator = playerValidator;
             _gameSettingsValidator = settingsValidator;
         }
@@ -40,8 +44,7 @@ namespace Hangman.Application.Services
                 {
                     throw new Exception("Game could not be created");
                 };
-                var randomService = new RandomService();
-                roomCode = randomService.RandomString(6);
+                roomCode = _randomService.RandomString(6);
                 try
                 {
                     result = await _gameReopsitory.CreateGameAsync(roomCode, token);
@@ -56,11 +59,11 @@ namespace Hangman.Application.Services
         {
             await _playerValidator.ValidateAndThrowAsync(player, cancellationToken: token);
             
-            var gameLeader = await _gameReopsitory.GetGameLeader(player.roomCode);
+            var gameLeader = await _userRepository.GetGameLeader(player.roomCode);
 
             if (gameLeader == null)
             {
-                await _gameReopsitory.SetGameLeader(player, cancellationToken: token);
+                await _userRepository.SetGameLeader(player, cancellationToken: token);
             }
             
             return await _gameReopsitory.JoinGameAsync(player, token);
@@ -70,7 +73,7 @@ namespace Hangman.Application.Services
         {
             await _gameSettingsValidator.ValidateAndThrowAsync(gameSettings, cancellationToken: token);
 
-            if(await _gameReopsitory.GetGameLeader(gameSettings.roomCode, token) != userId)
+            if(await _userRepository.GetGameLeader(gameSettings.roomCode, token) != userId)
             {
                 throw new Exception("401;Unauthorized");
             }
@@ -82,7 +85,7 @@ namespace Hangman.Application.Services
 
         public async Task<IEnumerable<string>> GetAllPlayers(string roomCode, Guid userId, CancellationToken token = default)
         {
-            var userGameCode = await _gameReopsitory.GetUserGame(userId);
+            var userGameCode = await _userRepository.GetUserGame(userId);
             // Validation
             if (!Regex.IsMatch(roomCode, @"(^[A-Za-z0-9]+$)") || roomCode.Length != 6)
             {
