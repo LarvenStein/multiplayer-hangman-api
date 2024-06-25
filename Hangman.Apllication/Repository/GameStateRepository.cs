@@ -72,8 +72,11 @@ namespace Hangman.Application.Repository
                         game.Rounds, 
                         wordlist.name AS Wordlist, 
                         (SELECT CASE 
-                            WHEN COUNT(*) = 0 THEN 'Lobby'
-                            -- TODO: Put something here for maxrounds + 1
+                            WHEN COUNT(*) = 0 THEN 'lobby'
+                            WHEN (SELECT COUNT(*)
+                                  FROM ROUND 
+                                  WHERE RoomCode = (@gameCode)
+                                  AND status = "active") = 0 THEN 'done'
                             ELSE 'playing'
                         END AS Status
                         FROM Round
