@@ -10,6 +10,7 @@
             app.MapStartGame();
             app.MapGetGameStatus();
             app.MapGetPlayers();
+            app.MapCreateGuess();
             return app;
         }
     }

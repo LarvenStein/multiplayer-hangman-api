@@ -52,11 +52,12 @@ namespace Hangman.Application.Database
             // Creating the guesses table
             await connection.ExecuteAsync("""
                 CREATE TABLE IF NOT EXISTS Guess (
+                -- Gu
                 PlayerId CHAR(36),
-                RoundId CHAR(36),
-                Letter CHAR not null,
-                Correct BOOL not null,
-                PRIMARY KEY (PlayerId, RoundId)
+                RoomCode CHAR(6),
+                RoundNum TINYINT,
+                Guess TEXT not null,
+                Correct BOOL not null
                 )
                 """);
 

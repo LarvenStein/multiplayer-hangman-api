@@ -1,4 +1,6 @@
-﻿namespace Hangman.Api.Endpoints
+﻿using K4os.Compression.LZ4.Streams.Internal;
+
+namespace Hangman.Api.Endpoints
 {
     public class ApiEndpoints
     {
@@ -15,6 +17,8 @@
         public const string GameStatus = $"{ApiBase}/games/{{roomCode}}";
 
         public const string GetPlayers = $"/{ApiBase}/games/{{roomCode}}/players";
+
+        public const string CreateGuess = $"{ApiBase}/games/{{roomCode}}/rounds/{{round:int}}/guess";
 
     }
 }

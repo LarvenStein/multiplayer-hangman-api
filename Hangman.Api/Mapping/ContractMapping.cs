@@ -80,5 +80,26 @@ namespace Hangman.Api.Mapping
                 isPlayerGameLeader = gameLeader
             };
         }
+
+        public static Guess MapToGuess(this CreateGuessRequest request, string gameCode, Guid userId, int round)
+        {
+            return new Guess
+            {
+                playerId = userId,
+                roomCode = gameCode,
+                roundNum = round,
+                guess = request.guess.ToUpper()
+            };
+        }
+
+        public static CreateGuessResponse MapToResponse(this Guess guess)
+        {
+            return new CreateGuessResponse
+            {
+                correct = guess.correct,
+                guess = guess.guess,
+                roundNum = guess.roundNum
+            };
+        }
     }
 }
