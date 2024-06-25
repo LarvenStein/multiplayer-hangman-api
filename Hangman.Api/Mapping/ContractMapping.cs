@@ -58,5 +58,18 @@ namespace Hangman.Api.Mapping
             };
         }
 
+        public static RoomStatusResponse MapToResponse(this GameStatus gameStatus)
+        {
+            return new RoomStatusResponse
+            {
+                roomCode = gameStatus.roomCode,
+                maxPlayers = gameStatus.maxPlayers,
+                rounds = gameStatus.rounds,
+                wordList = gameStatus.wordList,
+                status = gameStatus.status,
+                round = gameStatus.round,
+
+            };
+        }
     }
 }
