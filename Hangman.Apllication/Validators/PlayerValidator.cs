@@ -18,7 +18,7 @@ namespace Hangman.Application.Validators
             RuleFor(x => x.Nickname)
                 .NotEmpty()
                 .Matches(@"([A-Za-z0-9_-]+)").WithMessage("Name should only contain letters.")
-                .Length(3, 10);
+                .Length(3, 25);
             RuleFor(x => x.roomCode)
                 .NotEmpty()
                 .Matches(@"(^[A-Za-z0-9]+$)").WithMessage("Provide a valid room code")
