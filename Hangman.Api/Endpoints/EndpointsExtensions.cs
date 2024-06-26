@@ -10,9 +10,10 @@
             app.MapStartGame();
             app.MapGetGameStatus();
             app.MapGetPlayers();
-            app.MapCreateGuess();
-            app.MapGetRoundStatus();
             app.MapGetRoundsStatus();
+            app.MapGetRoundStatus();
+            app.MapCreateGuess();
+            app.MapGetWordlists();
             return app;
         }
     }

@@ -100,5 +100,10 @@ namespace Hangman.Application.Services
 
 
         }
+
+        public async Task<IEnumerable<Wordlist>> GetWordlists(CancellationToken token = default)
+        {
+            return await _gameReopsitory.GetWordlists(token);
+        }
     }
 }

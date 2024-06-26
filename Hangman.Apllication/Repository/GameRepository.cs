@@ -57,6 +57,17 @@ namespace Hangman.Application.Repository
             return result;
         }
 
+        public async Task<IEnumerable<Wordlist>> GetWordlists(CancellationToken token = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
+            var result = await connection.QueryAsync<Wordlist>(new CommandDefinition("""
+                SELECT WordlistId AS Id, Name
+                FROM wordlist
+                """, cancellationToken: token));
+
+            return result;
+        }
+
         public async Task<bool> JoinGameAsync(Player player, CancellationToken token = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(token);

@@ -15,6 +15,7 @@ var config = builder.Configuration;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddOutputCache();
 
 builder.Services.AddApplication();
 builder.Services.AddDatabase($"server={config["ConnectionSettings:Server"]!};" +
@@ -35,6 +36,8 @@ app.UseHttpsRedirection();
 
 //app.UseAuthorization();
 app.MapApiEndpoints();
+
+app.UseOutputCache();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
 //app.MapControllers();

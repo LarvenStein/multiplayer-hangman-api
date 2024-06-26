@@ -13,6 +13,6 @@ namespace Hangman.Application.Repository
         Task<bool> JoinGameAsync(Player player, CancellationToken token = default);
         Task<bool> EditGameAsync(GameSettings gameSettings, CancellationToken cancellationToken = default);
         Task<IEnumerable<string>> GetAllPlayers(string roomCode, CancellationToken token = default);
-
+        Task<IEnumerable<Wordlist>> GetWordlists(CancellationToken token = default);
     }
 }

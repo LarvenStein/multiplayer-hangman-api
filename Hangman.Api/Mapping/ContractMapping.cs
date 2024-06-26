@@ -145,5 +145,14 @@ namespace Hangman.Api.Mapping
                 wrongLetters = x.wrongLetters!
             });
         }
+
+        public static IEnumerable<GetWordListResponse> MapToResponse(this IEnumerable<Wordlist> wordlists)
+        {
+            return wordlists.Select(x => new GetWordListResponse
+            {
+                Id = x.Id,
+                Name = x.Name,
+            });
+        }
     }
 }
