@@ -130,5 +130,20 @@ namespace Hangman.Api.Mapping
                 wrongLetters = roundStatus.wrongLetters!
             };
         }
+
+        public static IEnumerable<GetRoudStatusResponse> MapToResponse(this IEnumerable<RoundStatus> rounds)
+        {
+            return rounds.Select(x => new GetRoudStatusResponse
+            {
+                roomCode = x.roomCode,
+                roundNum = x.roundNum,
+                status = x.status!,
+                correctGuesses = x.correctGuesses,
+                falseGuesses = x.falseGuesses,
+                lifesLeft = x.livesLeft,
+                guessedWord = x.guessedWord,
+                wrongLetters = x.wrongLetters!
+            });
+        }
     }
 }

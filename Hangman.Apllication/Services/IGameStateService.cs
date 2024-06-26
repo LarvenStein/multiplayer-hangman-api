@@ -13,5 +13,6 @@ namespace Hangman.Application.Services
         Task<GameStatus> GetGameStatus(string roomCode, Guid userId, CancellationToken token = default);
         Task<Guess> HandleGuess(Guess guess, CancellationToken token = default);
         Task<RoundStatus> GetRoundStatus(RoundStatus status, CancellationToken token = default);
+        Task<IEnumerable<RoundStatus>> GetRoundsStatus(String roomCode, Guid userId, CancellationToken token = default);
     }
 }

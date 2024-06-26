@@ -172,5 +172,31 @@ namespace Hangman.Application.Services
             }
             return status;
         }
+
+        public async Task<IEnumerable<RoundStatus>> GetRoundsStatus(string roomCode, Guid userId, CancellationToken token = default)
+        {
+            var userGameCode = await _userRepository.GetUserGame(userId);
+            // Validation
+            if (!Regex.IsMatch(roomCode, @"(^[A-Za-z0-9]+$)") || roomCode.Length != 6)
+            {
+                throw new ValidationException("Invalid room code");
+            }
+            if (userGameCode != roomCode)
+            {
+                throw new Exception("401;Unauthorized");
+            }
+            int currentRound = await _gameStateRepository.GetCurrentRound(roomCode,token);
+
+            List<RoundStatus> result = new List<RoundStatus>();
+
+            for (int i = 1; i <= currentRound; i++)
+            {
+                var status = new RoundStatus { roomCode= roomCode, roundNum= i, userId = userId };
+                var roundStatus = await GetRoundStatus(status, token);
+                result.Add(roundStatus);
+            }
+
+            return result;
+        }
     }
 }
