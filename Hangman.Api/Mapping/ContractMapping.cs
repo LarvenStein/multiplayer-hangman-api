@@ -8,6 +8,10 @@ namespace Hangman.Api.Mapping
 {
     public static class ContractMapping
     {
+        public static CreateGameResponse MapToResponse(this String roomCode)
+        {
+            return new CreateGameResponse { roomCode = roomCode };
+        }
         public static Player MapToPlayer(this JoinGameRequest request,  String roomCode)
         {
             return new Player

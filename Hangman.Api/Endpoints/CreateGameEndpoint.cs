@@ -1,4 +1,5 @@
-﻿using Hangman.Application.Services;
+﻿using Hangman.Api.Mapping;
+using Hangman.Application.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +16,7 @@ namespace Hangman.Api.Endpoints
             {
                 var roomId = await gameService.CreateGameAsync(token);
 
-                return TypedResults.Created($"/games/{roomId}/players", roomId);
+                return TypedResults.Created($"/games/{roomId}/players", roomId!.MapToResponse());
 
             });
             return app;
