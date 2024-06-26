@@ -11,6 +11,7 @@
             app.MapGetGameStatus();
             app.MapGetPlayers();
             app.MapCreateGuess();
+            app.MapGetRoundStatus();
             return app;
         }
     }

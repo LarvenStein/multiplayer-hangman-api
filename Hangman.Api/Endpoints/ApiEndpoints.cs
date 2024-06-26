@@ -18,6 +18,8 @@ namespace Hangman.Api.Endpoints
 
         public const string GetPlayers = $"/{ApiBase}/games/{{roomCode}}/players";
 
+        public const string RoundStatus = $"{ApiBase}/games/{{roomCode}}/rounds/{{round:int}}";
+
         public const string CreateGuess = $"{ApiBase}/games/{{roomCode}}/rounds/{{round:int}}/guess";
 
     }

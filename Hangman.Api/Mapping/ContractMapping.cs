@@ -101,5 +101,30 @@ namespace Hangman.Api.Mapping
                 roundNum = guess.roundNum
             };
         }
+
+        public static RoundStatus MapToRoundStatus(this string gameCode, Guid userId, int round)
+        {
+            return new RoundStatus
+            {
+                roomCode = gameCode,
+                roundNum = round,
+                userId = userId
+            };
+        }
+
+        public static GetRoudStatusResponse MapToResponse(this RoundStatus roundStatus)
+        {
+            return new GetRoudStatusResponse
+            {
+                roomCode = roundStatus.roomCode,
+                roundNum = roundStatus.roundNum,
+                status = roundStatus.status!,
+                correctGuesses = roundStatus.correctGuesses,
+                falseGuesses = roundStatus.falseGuesses,
+                lifesLeft = roundStatus.livesLeft,
+                guessedWord = roundStatus.guessedWord,
+                wrongLetters = roundStatus.wrongLetters!
+            };
+        }
     }
 }

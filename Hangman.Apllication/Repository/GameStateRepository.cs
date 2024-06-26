@@ -93,7 +93,7 @@ namespace Hangman.Application.Repository
 
         public async Task<string> GetRoundState(string gameCode, int round, CancellationToken token = default)
         {
-            using var connection = await _connectionFactory.CreateConnectionAsync();
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
                 SELECT Status   
                 FROM round
@@ -105,7 +105,7 @@ namespace Hangman.Application.Repository
 
         public async Task<string> GetWord(string gameCode, int round, CancellationToken token = default)
         {
-            using var connection = await _connectionFactory.CreateConnectionAsync();
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
                 SELECT Word
                 FROM round
@@ -117,7 +117,7 @@ namespace Hangman.Application.Repository
 
         public async Task<string> GetWordList(string gameCode, CancellationToken cancellationToken = default)
         {
-            using var connection = await _connectionFactory.CreateConnectionAsync();
+            using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
             var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
                 SELECT wordlist.Path
                 FROM game INNER JOIN wordlist
@@ -127,9 +127,21 @@ namespace Hangman.Application.Repository
             return result;
         }
 
+        public async Task<IEnumerable<string>> GetWrongGuesses(string roomCode, int roundNum, CancellationToken token = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
+            return await connection.QueryAsync<string>(new CommandDefinition("""
+                SELECT Guess
+                FROM guess
+                WHERE RoomCode = (@roomCode)
+                AND RoundNum = (@roundNum)
+                AND Correct = 0
+                """, new { roomCode, roundNum }, cancellationToken: token));
+        }
+
         public async Task<bool> GuessExsists(Guess guess, CancellationToken token = default)
         {
-            using var connection = await _connectionFactory.CreateConnectionAsync();
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QuerySingleAsync<int>(new CommandDefinition("""
                 SELECT COUNT(*)
                 FROM guess
@@ -137,7 +149,7 @@ namespace Hangman.Application.Repository
                 AND RoundNum = (@roundNum)
                 AND Guess = (@guess)
                 """, guess, cancellationToken: token));
-            return result > 1;
+            return result >= 1;
         }
 
         public async Task<bool> MakeGuess(Guess guess, CancellationToken token = default)

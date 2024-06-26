@@ -17,13 +17,15 @@ namespace Hangman.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IGameStateRepository _gameStateRepository;
         private readonly IValidator<Guess> _guessValidator;
+        private readonly IValidator<RoundStatus> _roundStatusValidator;
 
-        public GameStateService(IGameReopsitory gameReopsitory, IUserRepository userRepository, IGameStateRepository gameStateRepository, IValidator<Guess> guessValidator)
+        public GameStateService(IGameReopsitory gameReopsitory, IUserRepository userRepository, IGameStateRepository gameStateRepository, IValidator<Guess> guessValidator, IValidator<RoundStatus> roundStatusValidator)
         {
             _gameReopsitory = gameReopsitory;
             _userRepository = userRepository;
             _gameStateRepository = gameStateRepository;
             _guessValidator = guessValidator;
+            _roundStatusValidator = roundStatusValidator;
         }
 
         private static Random random = new Random();
@@ -76,9 +78,9 @@ namespace Hangman.Application.Services
             await _guessValidator.ValidateAndThrowAsync(guess, cancellationToken: token);
             var userGameCode = await _userRepository.GetUserGame(guess.playerId);
 
+            if (await _gameStateRepository.GetRoundState(guess.roomCode, guess.roundNum) != "active") throw new Exception("400;Round not active");
             if (userGameCode != guess.roomCode) throw new Exception("401;Unauthorized");
             if (await _gameStateRepository.GuessExsists(guess, token)) throw new Exception("400;Guess was already made");
-            if (await _gameStateRepository.GetRoundState(guess.roomCode, guess.roundNum) != "active") throw new Exception("400;Round not active");
 
             string word = await _gameStateRepository.GetWord(guess.roomCode, guess.roundNum, token);
             char[] letters = word.ToCharArray();
@@ -125,6 +127,50 @@ namespace Hangman.Application.Services
                 if(letter == guessLetter) found = true;
             }
             return found;
+        }
+
+        public async Task<RoundStatus> GetRoundStatus(RoundStatus status, CancellationToken token = default)
+        {
+            var userGameCode = await _userRepository.GetUserGame(status.userId);
+            await _roundStatusValidator.ValidateAndThrowAsync(status, token);
+            if (userGameCode != status.roomCode) throw new Exception("401;Unauthorized");
+
+            // Finding out if the round even exsists (quick and dirty version)
+            try
+            {
+                status.word = await _gameStateRepository.GetWord(status.roomCode, status.roundNum, token);
+            } catch(InvalidOperationException)
+            {
+                throw new Exception("404;Round not found");
+            }
+            
+            status.status = await _gameStateRepository.GetRoundState(status.roomCode, status.roundNum, token);
+
+            // I played myself a bit by making the argument for the counting methods a 'Guess'
+            // But no problem for me :>
+            var fakeGuess = new Guess { roomCode = status.roomCode, roundNum = status.roundNum, playerId = status.userId, guess = "" };
+
+            status.falseGuesses = await _gameStateRepository.CountIncorrectGuesses(fakeGuess);
+            status.correctGuesses = await _gameStateRepository.CountCorrectGuesses(fakeGuess);
+            status.livesLeft = GameConstants.maxGuesses - status.falseGuesses;
+            status.wrongLetters = await _gameStateRepository.GetWrongGuesses(status.roomCode, status.roundNum, token);
+
+            fakeGuess = null;
+            char[] wordArray = status.word.ToCharArray();
+            foreach (char letter in wordArray)
+            {
+                fakeGuess = new Guess { roomCode = status.roomCode, roundNum = status.roundNum, playerId = status.userId, guess = letter.ToString() };
+                bool guessExsists = await _gameStateRepository.GuessExsists(fakeGuess);
+                if (guessExsists || status.status != "active")
+                {
+                    status.guessedWord.Add(letter);
+                } else
+                {
+                    status.guessedWord.Add('_');
+                }
+                fakeGuess = null;
+            }
+            return status;
         }
     }
 }
