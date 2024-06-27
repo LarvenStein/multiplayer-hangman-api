@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -19,14 +20,16 @@ namespace Hangman.Application.Services
     {
         private readonly IGameReopsitory _gameReopsitory;
         private readonly IUserRepository _userRepository;
+        private readonly IGameStateRepository _gameStateRepository;
         private readonly IRandomService _randomService;
         private readonly IValidator<Player> _playerValidator;
         private readonly IValidator<GameSettings> _gameSettingsValidator;
 
-        public GameService(IGameReopsitory gameReopsitory, IUserRepository userRepository, IValidator<Player> playerValidator, IValidator<GameSettings> settingsValidator, IRandomService randomService)
+        public GameService(IGameReopsitory gameReopsitory, IUserRepository userRepository, IGameStateRepository gameStateRepository, IValidator<Player> playerValidator, IValidator<GameSettings> settingsValidator, IRandomService randomService)
         {
             _gameReopsitory = gameReopsitory;
             _userRepository = userRepository;
+            _gameStateRepository = gameStateRepository;
             _randomService = randomService;
             _playerValidator = playerValidator;
             _gameSettingsValidator = settingsValidator;
@@ -65,7 +68,16 @@ namespace Hangman.Application.Services
             {
                 await _userRepository.SetGameLeader(player, cancellationToken: token);
             }
-            
+
+            var playerList = await _gameReopsitory.GetAllPlayers(player.roomCode, token);
+            var gameSettings = await _gameStateRepository.GetGame(player.roomCode, token);
+
+            if (playerList.Count() >= gameSettings.maxPlayers)
+            {
+                throw new Exception("403;Game already full :(");
+            }
+
+
             return await _gameReopsitory.JoinGameAsync(player, token);
         }
 
