@@ -21,5 +21,6 @@ namespace Hangman.Application.Repository
         Task<string> GetRoundState(String gameCode, int round, CancellationToken token = default);
         Task<bool> SetRoundState(String roomCode, int roundNum, string newState,  CancellationToken token = default);
         Task<IEnumerable<string>> GetWrongGuesses(String roomCode, int roundNum, CancellationToken token = default);
+        Task<bool> DeleteRounds(String roomCode);
     }
 }

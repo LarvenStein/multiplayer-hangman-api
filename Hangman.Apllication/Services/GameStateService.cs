@@ -41,12 +41,21 @@ namespace Hangman.Application.Services
             {
                 throw new Exception("401;Unauthorized");
             }
-            if (await _gameStateRepository.GetCurrentRound(roomCode, token) > 0 && start)
+
+            var gameState = await GetGameStatus(roomCode, userId, token);
+            bool newGamePossible = gameState.rounds < (gameState.round + 1);
+            if (await _gameStateRepository.GetCurrentRound(roomCode, token) > 0 && start && !newGamePossible)
             {
                 throw new Exception("409;Game already started");
             }
-            var gameState = await GetGameStatus(roomCode, userId, token);
-            if (gameState.rounds < (gameState.round + 1)) return gameState.round + 1;
+
+            if (newGamePossible) return gameState.round + 1;
+
+            // If game has endet and startGame requested, delete old rounds
+            if (newGamePossible && start)
+            {
+                var deleted = _gameStateRepository.DeleteRounds(roomCode);
+            }
 
             // Get word from wordlist
             string wlUrl = await _gameStateRepository.GetWordList(roomCode);

@@ -49,6 +49,18 @@ namespace Hangman.Application.Repository
             return roundNum;
         }
 
+        public async Task<bool> DeleteRounds(string roomCode)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+            var result = await connection.ExecuteAsync(new CommandDefinition("""
+                DELETE FROM round
+                WHERE RoomCode = (@roomCode);
+                DELETE FROM guess
+                WHERE RoomCode = (@roomCode);
+                """, new { roomCode }));
+            return result > 0;
+        }
+
         public async Task<int> GetCurrentRound(string gameCode, CancellationToken cancellationToken = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
