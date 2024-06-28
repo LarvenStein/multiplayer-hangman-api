@@ -49,13 +49,15 @@ namespace Hangman.Application.Services
                 throw new Exception("409;Game already started");
             }
 
-            if (newGamePossible) return gameState.round + 1;
 
             // If game has endet and startGame requested, delete old rounds
             if (newGamePossible && start)
             {
                 var deleted = _gameStateRepository.DeleteRounds(roomCode);
             }
+
+            if (newGamePossible) return gameState.round + 1;
+
 
             // Get word from wordlist
             string wlUrl = await _gameStateRepository.GetWordList(roomCode);

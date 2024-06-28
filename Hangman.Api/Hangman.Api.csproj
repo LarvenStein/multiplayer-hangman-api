@@ -19,6 +19,6 @@
     <ProjectReference Include="..\Hangman.Contracts\Hangman.Contracts.csproj" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties databasesettings_1json__JsonSchema="https://json.schemastore.org/appsettings.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>
