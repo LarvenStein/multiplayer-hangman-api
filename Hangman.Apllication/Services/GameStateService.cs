@@ -53,7 +53,7 @@ namespace Hangman.Application.Services
                 var deleted = _gameStateRepository.DeleteRounds(roomCode);
             }
 
-            if (newGamePossible) return gameState.round + 1;
+            if (newGamePossible && !start) return gameState.round + 1;
 
 
             // Get word from wordlist
