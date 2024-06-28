@@ -44,14 +44,11 @@ namespace Hangman.Application.Services
 
             var gameState = await GetGameStatus(roomCode, userId, token);
             bool newGamePossible = gameState.rounds < (gameState.round + 1);
-            if (await _gameStateRepository.GetCurrentRound(roomCode, token) > 0 && start && !newGamePossible)
-            {
-                throw new Exception("409;Game already started");
-            }
 
 
-            // If game has endet and startGame requested, delete old rounds
-            if (newGamePossible && start)
+
+            // If startGame requested, delete old rounds
+            if (start)
             {
                 var deleted = _gameStateRepository.DeleteRounds(roomCode);
             }
