@@ -57,6 +57,19 @@ namespace Hangman.Application.Repository
             return result;
         }
 
+        public async Task<string> GetRandomWord(int wordList)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+            var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
+                SELECT Word
+                FROM Words
+                WHERE WordlistId = (@wordList)
+                ORDER BY RAND() LIMIT 1
+                """, new { wordList }));
+
+            return result;
+        }
+
         public async Task<IEnumerable<Wordlist>> GetWordlists(CancellationToken token = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(token);

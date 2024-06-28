@@ -127,11 +127,11 @@ namespace Hangman.Application.Repository
             return result.ToUpper();
         }
 
-        public async Task<string> GetWordList(string gameCode, CancellationToken cancellationToken = default)
+        public async Task<int> GetWordList(string gameCode, CancellationToken cancellationToken = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
-            var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
-                SELECT wordlist.Path
+            var result = await connection.QuerySingleAsync<int>(new CommandDefinition("""
+                SELECT wordlist.WordListId
                 FROM game INNER JOIN wordlist
                 ON game.WordList = wordlist.WordlistId
                 WHERE game.Roomcode = (@gameCode)

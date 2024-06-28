@@ -57,11 +57,8 @@ namespace Hangman.Application.Services
 
 
             // Get word from wordlist
-            string wlUrl = await _gameStateRepository.GetWordList(roomCode);
-            HttpClient client = new HttpClient();
-            string rawWordList = await client.GetStringAsync(wlUrl);
-            var wordList = rawWordList.Split(Environment.NewLine);
-            string word = wordList[random.Next(0, wordList.Length - 1)];
+            int wordList = await _gameStateRepository.GetWordList(roomCode);
+            string word = await _gameReopsitory.GetRandomWord(wordList);
 
             return await _gameStateRepository.NextRoundAsync(roomCode, word, token);
         }

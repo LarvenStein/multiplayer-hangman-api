@@ -65,8 +65,16 @@ namespace Hangman.Application.Database
             await connection.ExecuteAsync("""
                 CREATE TABLE IF NOT EXISTS Wordlist (
                 WordlistId INT primary key AUTO_INCREMENT,
-                Path TEXT,
                 Name TEXT)
+                """);
+
+            // Creating words table
+            await connection.ExecuteAsync("""
+                CREATE TABLE IF NOT EXISTS Words (
+                WordlistId INT,
+                Word TEXT,
+                FOREIGN KEY (WordlistId) REFERENCES Wordlist(WordlistId)
+                )
                 """);
         }
     }
