@@ -25,7 +25,7 @@ namespace Hangman.Application.Repository
             int roundNum = 0;
             roundNum += await connection.QuerySingleAsync<int>(new CommandDefinition("""
                 SElECT COUNT(*)
-                FROM guess
+                FROM Guess
                 WHERE RoomCode = (@roomCode)
                 AND RoundNum = (@roundNum)
                 AND Correct = 1
@@ -40,7 +40,7 @@ namespace Hangman.Application.Repository
             int roundNum = 0;
             roundNum += await connection.QuerySingleAsync<int>(new CommandDefinition("""
                 SElECT COUNT(*)
-                FROM guess
+                FROM Guess
                 WHERE RoomCode = (@roomCode)
                 AND RoundNum = (@roundNum)
                 AND Correct = 0
@@ -53,9 +53,9 @@ namespace Hangman.Application.Repository
         {
             using var connection = await _connectionFactory.CreateConnectionAsync();
             var result = await connection.ExecuteAsync(new CommandDefinition("""
-                DELETE FROM round
+                DELETE FROM Round
                 WHERE RoomCode = (@roomCode);
-                DELETE FROM guess
+                DELETE FROM Guess
                 WHERE RoomCode = (@roomCode);
                 """, new { roomCode }));
             return result > 0;
@@ -67,7 +67,7 @@ namespace Hangman.Application.Repository
             int roundNum = 0;
             roundNum += await connection.QuerySingleAsync<int>(new CommandDefinition("""
                 SElECT COUNT(*)
-                FROM round
+                FROM Round
                 WHERE NOT Status = "inactive"
                 AND RoomCode = (@gameCode)
                 """, new { gameCode }, cancellationToken: cancellationToken));
@@ -80,27 +80,27 @@ namespace Hangman.Application.Repository
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QuerySingleAsync<GameStatus>(new CommandDefinition("""
-                SELECT game.RoomCode, 
-                        game.MaxPlayers, 
-                        game.Rounds, 
-                        wordlist.name AS Wordlist, 
+                SELECT Game.RoomCode, 
+                        Game.MaxPlayers, 
+                        Game.Rounds, 
+                        Wordlist.name AS Wordlist, 
                         (SELECT CASE 
                             WHEN COUNT(*) = 0 THEN 'lobby'
                             WHEN (SELECT COUNT(*)
-                                  FROM ROUND 
+                                  FROM Round 
                                   WHERE RoomCode = (@gameCode)
                                   AND status = "active") = 0 THEN 'done'
                             ELSE 'playing'
                         END AS Status
                         FROM Round
                         WHERE RoomCode = (@gameCode)) AS status,
-                        (SElECT COUNT(*)
-                        FROM round
+                        (SELECT COUNT(*)
+                        FROM Round
                         WHERE NOT Status = "inactive"
                         AND RoomCode = (@gameCode)) AS round
-                FROM game INNER JOIN wordlist
-                ON game.WordList = wordlist.WordlistId
-                WHERE game.roomCode = (@gameCode)
+                FROM Game INNER JOIN Wordlist
+                ON Game.WordList = Wordlist.WordlistId
+                WHERE Game.roomCode = (@gameCode)
                 """, new { gameCode }, cancellationToken: token));
             return result;
         }
@@ -110,7 +110,7 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
                 SELECT Status   
-                FROM round
+                FROM Round
                 WHERE RoomCode = (@gameCode)
                 AND RoundNum = (@round)
                 """, new { gameCode, round }, cancellationToken: token));
@@ -122,7 +122,7 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
                 SELECT Word
-                FROM round
+                FROM Round
                 WHERE RoomCode = (@gameCode)
                 AND RoundNum = (@round)
                 """, new { gameCode, round }, cancellationToken: token));
@@ -133,10 +133,10 @@ namespace Hangman.Application.Repository
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
             var result = await connection.QuerySingleAsync<int>(new CommandDefinition("""
-                SELECT wordlist.WordListId
-                FROM game INNER JOIN wordlist
-                ON game.WordList = wordlist.WordlistId
-                WHERE game.Roomcode = (@gameCode)
+                SELECT Wordlist.WordlistId
+                FROM Game INNER JOIN Wordlist
+                ON Game.WordList = Wordlist.WordlistId
+                WHERE Game.Roomcode = (@gameCode)
                 """, new { gameCode }, cancellationToken: cancellationToken));
             return result;
         }
@@ -146,7 +146,7 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
             return await connection.QueryAsync<string>(new CommandDefinition("""
                 SELECT Guess
-                FROM guess
+                FROM Guess
                 WHERE RoomCode = (@roomCode)
                 AND RoundNum = (@roundNum)
                 AND Correct = 0
@@ -158,7 +158,7 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QuerySingleAsync<int>(new CommandDefinition("""
                 SELECT COUNT(*)
-                FROM guess
+                FROM Guess
                 WHERE RoomCode = (@roomCode)
                 AND RoundNum = (@roundNum)
                 AND Guess = (@guess)
@@ -171,7 +171,7 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
 
             var result = await connection.ExecuteAsync(new CommandDefinition("""
-                INSERT INTO guess
+                INSERT INTO Guess
                 VALUES (@playerId, @roomCode, @roundNum, @guess, @correct)
 
                 """, guess, cancellationToken: token));
@@ -188,7 +188,7 @@ namespace Hangman.Application.Repository
             roundNum++;
 
             var result = await connection.ExecuteAsync(new CommandDefinition("""
-                UPDATE round
+                UPDATE Round
                 SET Status = "active"
                 WHERE RoundNum = (@roundNum)
                 AND RoomCode = (@gameCode)
@@ -197,13 +197,6 @@ namespace Hangman.Application.Repository
 
             if (result < 0) { }
 
-            /*            var result = await connection.ExecuteAsync(new CommandDefinition("""
-                            INSERT INTO round (Word, RoundNum, RoomCode)
-                            VALUES (@word, @roundNum, @gameCode)
-
-                            """, new { gameCode, word, roundNum }, cancellationToken: token));
-
-                        if (result < 0) { }*/
 
             return roundNum;
         }
@@ -213,7 +206,7 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
 
             var result = await connection.ExecuteAsync(new CommandDefinition("""
-                UPDATE round
+                UPDATE Round
                 SET Status = (@newState)
                 WHERE RoomCode = (@roomCode)
                 AND RoundNum = (@roundNum)

@@ -4,7 +4,7 @@ using Hangman.Api.Endpoints;
 using Hangman.Api.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddJsonFile("databasesettings.json");
+//builder.Configuration.AddJsonFile("databasesettings.json");
 var config = builder.Configuration;
 
 builder.Services.AddCors();
@@ -19,10 +19,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOutputCache();
 
 builder.Services.AddApplication();
-builder.Services.AddDatabase($"server={config["ConnectionSettings:Server"]!};" +
-    $"uid={config["ConnectionSettings:User"]!};" +
-    $"pwd={config["ConnectionSettings:Password"]!};" +
-    $"database={config["ConnectionSettings:Database"]!}");
+
+var getEnv = (string key) => Environment.GetEnvironmentVariable(key);
+
+builder.Services.AddDatabase($"server={getEnv("Server") ?? config["ConnectionSettings:Server"]!};" +
+    $"uid={getEnv("User") ?? config["ConnectionSettings:User"]!};" +
+    $"pwd={getEnv("Password") ?? config["ConnectionSettings:Password"]!};" +
+    $"database={getEnv("Database") ?? config["ConnectionSettings:Database"]!}");
 
 var app = builder.Build();
 

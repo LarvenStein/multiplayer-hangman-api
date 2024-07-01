@@ -50,7 +50,7 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QueryAsync<string>(new CommandDefinition("""
                 SELECT Name
-                FROM player
+                FROM Player
                 WHERE RoomCode = (@roomCode)
                 """, new { roomCode }, cancellationToken: token));
 
@@ -75,7 +75,7 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
             var result = await connection.QueryAsync<Wordlist>(new CommandDefinition("""
                 SELECT WordlistId AS Id, Name
-                FROM wordlist
+                FROM Wordlist
                 """, cancellationToken: token));
 
             return result;
@@ -99,9 +99,8 @@ namespace Hangman.Application.Repository
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
 
             var result = await connection.ExecuteAsync(new CommandDefinition("""
-                INSERT INTO round (Word, RoundNum, RoomCode)
+                INSERT INTO Round (Word, RoundNum, RoomCode)
                 VALUES (@word, @roundNum, @gameCode)
-
                 """, new { gameCode, roundNum, word }, cancellationToken: token));
 
 

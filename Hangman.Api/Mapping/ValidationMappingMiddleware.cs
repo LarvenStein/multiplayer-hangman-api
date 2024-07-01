@@ -34,6 +34,7 @@ namespace Hangman.Api.Mapping
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 string[] exContents = ex.Message.Split(";");
                 int exContentsMessageIndex = 1;
                 if(Int32.TryParse(exContents[0], out int statusCode))
