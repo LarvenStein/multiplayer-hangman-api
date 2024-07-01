@@ -14,5 +14,6 @@ namespace Hangman.Application.Services
         Task<bool> EditGameAsync(GameSettings gameSettings, Guid userId, CancellationToken token = default);
         Task<IEnumerable<string>> GetAllPlayers(string roomCode, Guid userId,  CancellationToken token = default);
         Task<IEnumerable<Wordlist>> GetWordlists(CancellationToken token = default);
+        Task<int> StartGameAsync(String roomCode, Guid userId, CancellationToken token = default);
     }
 }

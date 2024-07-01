@@ -57,15 +57,15 @@ namespace Hangman.Application.Repository
             return result;
         }
 
-        public async Task<string> GetRandomWord(int wordList)
+        public async Task<IEnumerable<string>> GetRandomWord(int wordList, int words)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync();
-            var result = await connection.QuerySingleAsync<string>(new CommandDefinition("""
+            var result = await connection.QueryAsync<string>(new CommandDefinition("""
                 SELECT Word
                 FROM Words
                 WHERE WordlistId = (@wordList)
-                ORDER BY RAND() LIMIT 1
-                """, new { wordList }));
+                ORDER BY RAND() LIMIT @words
+                """, new { wordList, words }));
 
             return result;
         }
@@ -92,6 +92,20 @@ namespace Hangman.Application.Repository
                 """, player, cancellationToken: token));
 
             return result > 0;
+        }
+
+        public async Task<bool> CreateRound(string gameCode, string word, int roundNum, CancellationToken token = default)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync(token);
+
+            var result = await connection.ExecuteAsync(new CommandDefinition("""
+                INSERT INTO round (Word, RoundNum, RoomCode)
+                VALUES (@word, @roundNum, @gameCode)
+
+                """, new { gameCode, roundNum, word }, cancellationToken: token));
+
+
+            return result < 0;
         }
     }
 }

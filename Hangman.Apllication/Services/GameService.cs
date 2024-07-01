@@ -117,5 +117,41 @@ namespace Hangman.Application.Services
         {
             return await _gameReopsitory.GetWordlists(token);
         }
+
+        public async Task<int> StartGameAsync(string roomCode, Guid userId, CancellationToken token = default)
+        {
+            // Validation
+            if (!Regex.IsMatch(roomCode, @"(^[A-Za-z0-9]+$)") || roomCode.Length != 6)
+            {
+                throw new ValidationException("Invalid room code");
+            }
+            if (await _userRepository.GetGameLeader(roomCode, token) != userId)
+            {
+                throw new Exception("401;Unauthorized");
+            }
+
+            var gameState = await _gameStateRepository.GetGame(roomCode, token);
+            bool newGamePossible = gameState.rounds < (gameState.round + 1);
+
+
+
+            // Delete old rounds
+            var deleted = _gameStateRepository.DeleteRounds(roomCode);
+            
+
+
+            // Get word from wordlist
+            int wordList = await _gameStateRepository.GetWordList(roomCode);
+            var words = await _gameReopsitory.GetRandomWord(wordList, gameState.rounds);
+
+            int i = 1;
+            foreach (var word in words)
+            {
+                await _gameReopsitory.CreateRound(roomCode, word, i, token);
+                i++;
+            }
+
+            return await _gameStateRepository.NextRoundAsync(roomCode, token);
+        }
     }
 }

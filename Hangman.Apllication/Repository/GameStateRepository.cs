@@ -68,7 +68,8 @@ namespace Hangman.Application.Repository
             roundNum += await connection.QuerySingleAsync<int>(new CommandDefinition("""
                 SElECT COUNT(*)
                 FROM round
-                WHERE RoomCode = (@gameCode)
+                WHERE NOT Status = "inactive"
+                AND RoomCode = (@gameCode)
                 """, new { gameCode }, cancellationToken: cancellationToken));
 
             return roundNum;
@@ -95,7 +96,8 @@ namespace Hangman.Application.Repository
                         WHERE RoomCode = (@gameCode)) AS status,
                         (SElECT COUNT(*)
                         FROM round
-                        WHERE RoomCode = (@gameCode)) AS round
+                        WHERE NOT Status = "inactive"
+                        AND RoomCode = (@gameCode)) AS round
                 FROM game INNER JOIN wordlist
                 ON game.WordList = wordlist.WordlistId
                 WHERE game.roomCode = (@gameCode)
@@ -177,7 +179,7 @@ namespace Hangman.Application.Repository
             return result > 0;
         }
 
-        public async Task<int> NextRoundAsync(string gameCode, string word, CancellationToken token = default)
+        public async Task<int> NextRoundAsync(string gameCode, CancellationToken token = default)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(token);
             int roundNum = 0;
@@ -186,12 +188,22 @@ namespace Hangman.Application.Repository
             roundNum++;
 
             var result = await connection.ExecuteAsync(new CommandDefinition("""
-                INSERT INTO round (Word, RoundNum, RoomCode)
-                VALUES (@word, @roundNum, @gameCode)
+                UPDATE round
+                SET Status = "active"
+                WHERE RoundNum = (@roundNum)
+                AND RoomCode = (@gameCode)
 
-                """, new { gameCode, word, roundNum }, cancellationToken: token));
+                """, new { gameCode, roundNum }, cancellationToken: token));
 
             if (result < 0) { }
+
+            /*            var result = await connection.ExecuteAsync(new CommandDefinition("""
+                            INSERT INTO round (Word, RoundNum, RoomCode)
+                            VALUES (@word, @roundNum, @gameCode)
+
+                            """, new { gameCode, word, roundNum }, cancellationToken: token));
+
+                        if (result < 0) { }*/
 
             return roundNum;
         }

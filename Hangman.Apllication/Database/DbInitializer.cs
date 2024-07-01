@@ -43,7 +43,7 @@ namespace Hangman.Application.Database
                 CREATE TABLE IF NOT EXISTS Round (
                 Word TINYTEXT not null,
                 RoundNum TINYINT not null,
-                Status TINYTEXT not null DEFAULT "active",
+                Status TINYTEXT not null DEFAULT "inactive",
                 RoomCode CHAR(6) not null,
                 PRIMARY KEY (RoundNum, RoomCode)
                 )

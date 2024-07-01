@@ -56,11 +56,11 @@ namespace Hangman.Application.Services
             if (newGamePossible && !start) return gameState.round + 1;
 
 
-            // Get word from wordlist
+/*            // Get word from wordlist
             int wordList = await _gameStateRepository.GetWordList(roomCode);
-            string word = await _gameReopsitory.GetRandomWord(wordList);
+            string word = await _gameReopsitory.GetRandomWord(wordList);*/
 
-            return await _gameStateRepository.NextRoundAsync(roomCode, word, token);
+            return await _gameStateRepository.NextRoundAsync(roomCode, token);
         }
 
         public async Task<GameStatus> GetGameStatus(string roomCode, Guid userId, CancellationToken token = default)
@@ -141,15 +141,21 @@ namespace Hangman.Application.Services
             if (userGameCode != status.roomCode) throw new Exception("401;Unauthorized");
 
             // Finding out if the round even exsists (quick and dirty version)
-            try
+/*            try
             {
                 status.word = await _gameStateRepository.GetWord(status.roomCode, status.roundNum, token);
             } catch(InvalidOperationException)
             {
                 throw new Exception("404;Round not found");
-            }
+            }*/
             
             status.status = await _gameStateRepository.GetRoundState(status.roomCode, status.roundNum, token);
+            if(status.status == "inactive")
+            {
+                throw new Exception("404;Round not found");
+            }
+            status.word = await _gameStateRepository.GetWord(status.roomCode, status.roundNum, token);
+
 
             // I played myself a bit by making the argument for the counting methods a 'Guess'
             // But no problem for me :>
