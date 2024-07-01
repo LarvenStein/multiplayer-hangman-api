@@ -14,10 +14,6 @@ jobs:
       #working-directory: LarvenStein/hangman-api
       run: docker build . -t LarvenStein/hangman-api:latest
       
-  publish:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
     - name: Log into Docker Hub
       uses: docker/login-action@v2
       with:
