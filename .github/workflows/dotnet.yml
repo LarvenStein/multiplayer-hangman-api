@@ -12,14 +12,14 @@ jobs:
     
     - name: Build the Docker image
       #working-directory: LarvenStein/hangman-api
-      run: docker build . -t LarvenStein/hangman-api:latest
+      run: docker build . -t LarvenStein/multiplayer-hangman-api:latest
       
-    - name: Log into Docker Hub
+    - name: Log into GHCR
       uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.TOKEN }}
 
-    - name: Push the image to Docker Hub
-      run: docker push LarvenStein/hangman-api
+    - name: Push the image to GHCR
+      run: docker push LarvenStein/multiplayer-hangman-api
