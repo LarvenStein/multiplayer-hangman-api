@@ -5,15 +5,19 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     
     - name: Build the Docker image
-      working-directory: LarvenStein/hangman-api
+      #working-directory: LarvenStein/hangman-api
       run: docker build . -t LarvenStein/hangman-api:latest
-
+      
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
     - name: Log into Docker Hub
       uses: docker/login-action@v2
       with:
