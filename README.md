@@ -7,17 +7,17 @@ Requierments:
 - MySql / Mariadb Database
 
 You can pull the docker image using:
-```bash
+```
   docker pull ghcr.io/larvenstein/multiplayer-hangman-api:latest
 ```
 
 If you want to use docker-run, you can use this:
-```bash
+```
 docker run --env=Server=192.168.1.100 --env=User=myusername --env=Password=mypassword --env=Database=mydatabase -p 8080:8080 -p 8081:8081 ghcr.io/larvenstein/multiplayer-hangman-api:latest
 ```
 
 I reccomend to use docker-compose, here is a template with a mariadb database:
-[[download]](http://example.com)
+[compose.yaml](https://raw.githubusercontent.com/LarvenStein/multiplayer-hangman-api/main/compose.yaml)
 ```yaml
 version: '3.8'
 
@@ -60,8 +60,8 @@ If  you want to, you can use my 6 wordlists with ~ 2 million words by connecting
 ## 🕹️ Playing
 As this is a rest api, you can play this with any client you want like:
 - My own frontend written in svelte
-  - [GitHub repo]()
-  - [Play it]()
+  - [Play it](http://example.com)
+  - [GitHub repo](https://github.com/LarvenStein/multiplayer-hangman-frontend)
 - Using a tool like insomnia or postman
 - Using a client that you developed yourself
 
