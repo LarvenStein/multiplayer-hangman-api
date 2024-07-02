@@ -1,5 +1,5 @@
 # Multiplayer hangman api
-A rest-api for playing hangman written in C# with .NET
+A multiplayer hangman rest-api written in C# with .NET
 
 ## 🔧 Installing
 Requierments:
