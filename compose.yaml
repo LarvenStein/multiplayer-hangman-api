@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: examplepassword
+      MYSQL_DATABASE: hangmandb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: examplepassword
+    ports:
+      - '3306:3306'
+    volumes:
+      - /path/to/mariadb/config:/config
+
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  multiplayer-hangman-api:
+    image: ghcr.io/larvenstein/multiplayer-hangman-api:latest
+    environment:
+      Server: mariadb
+      User: root
+      Password: examplepassword
+      Database: hangmandb
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    links:
+      - mariadb
