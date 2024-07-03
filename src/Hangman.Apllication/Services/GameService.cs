@@ -45,7 +45,7 @@ namespace Hangman.Application.Services
             {
                 if(tries > 10)
                 {
-                    throw new Exception("Game could not be created");
+                    throw new Exception("500;Game could not be created");
                 };
                 roomCode = _randomService.RandomString(6);
                 try
@@ -109,8 +109,6 @@ namespace Hangman.Application.Services
             }
 
             return await _gameReopsitory.GetAllPlayers(roomCode, token);
-
-
         }
 
         public async Task<IEnumerable<Wordlist>> GetWordlists(CancellationToken token = default)
