@@ -279,7 +279,6 @@ namespace Hangman.Application.Tests.Unit
             players.Should().BeEquivalentTo(expectedPlayers);
         }
 
-        // Startgame: All fine, not gameleader, invalid roomCode, 
         [Theory]
         [InlineData(new object[] { new string[] { "word1" } })]
         [InlineData(new object[] { new string[] { "word1", "word2" } })]
