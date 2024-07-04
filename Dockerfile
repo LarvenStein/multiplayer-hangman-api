@@ -4,17 +4,17 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
 EXPOSE 8080
-#EXPOSE 8081
+EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Hangman.Api/Hangman.Api.csproj", "Hangman.Api/"]
-COPY ["Hangman.Apllication/Hangman.Application.csproj", "Hangman.Apllication/"]
-COPY ["Hangman.Contracts/Hangman.Contracts.csproj", "Hangman.Contracts/"]
-RUN dotnet restore "./Hangman.Api/Hangman.Api.csproj"
+COPY ["src/Hangman.Api/Hangman.Api.csproj", "src/Hangman.Api/"]
+COPY ["src/Hangman.Apllication/Hangman.Application.csproj", "src/Hangman.Apllication/"]
+COPY ["src/Hangman.Contracts/Hangman.Contracts.csproj", "src/Hangman.Contracts/"]
+RUN dotnet restore "./src/Hangman.Api/Hangman.Api.csproj"
 COPY . .
-WORKDIR "/src/Hangman.Api"
+WORKDIR "/src/src/Hangman.Api"
 RUN dotnet build "./Hangman.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
