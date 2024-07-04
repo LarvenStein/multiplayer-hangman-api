@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Hangman.Api/databasesettings.json
+/src/Hangman.Api/databasesettings.json

@@ -29,6 +29,7 @@ namespace Hangman.Application.Services
         }
 
         private static Random random = new Random();
+        private static char[] acceptableLetters = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
         public async Task<int> NextRoundAsync(string roomCode, Guid userId, bool start, CancellationToken token = default)
         {
@@ -109,8 +110,8 @@ namespace Hangman.Application.Services
             await _gameStateRepository.MakeGuess(guess, token);
 
             int lifes = GameConstants.maxGuesses;
-            char[] uniqueLetters = letters.Distinct().ToArray();
-            int guessesNeeded = uniqueLetters.Length;
+            char[] uniqueAcceptableLetters = letters.Distinct().Where(letter => acceptableLetters.Contains(Char.ToUpper(letter))).ToArray();
+            int guessesNeeded = uniqueAcceptableLetters.Length;
             int falseGuesses = await _gameStateRepository.CountIncorrectGuesses(guess, token);
             int correctGuesses = await _gameStateRepository.CountCorrectGuesses(guess, token);
 
@@ -159,7 +160,7 @@ namespace Hangman.Application.Services
             {
                 fakeGuess = new Guess { roomCode = status.roomCode, roundNum = status.roundNum, playerId = status.userId, guess = letter.ToString() };
                 bool guessExsists = await _gameStateRepository.GuessExsists(fakeGuess);
-                if (guessExsists || status.status != "active")
+                if (guessExsists || status.status != "active" || !acceptableLetters.Contains(Char.ToUpper(letter)))
                 {
                     status.guessedWord.Add(letter);
                 } else
