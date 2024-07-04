@@ -37,12 +37,12 @@ namespace Hangman.Application.Services
             {
                 throw new ValidationException("Invalid room code");
             }
-            if (await _userRepository.GetGameLeader(roomCode, token) != userId && start)
+            /*if (await _userRepository.GetGameLeader(roomCode, token) != userId)
             {
                 throw new Exception("401;Unauthorized");
-            }
+            }*/
 
-            var gameState = await GetGameStatus(roomCode, userId, token);
+            var gameState = await _gameStateRepository.GetGame(roomCode, token);
             bool newGamePossible = gameState.rounds < (gameState.round + 1);
 
 
@@ -97,7 +97,14 @@ namespace Hangman.Application.Services
                 else guess.correct = false;
             } else
             {
-                guess.correct = searchLetter(guess.guess.ToCharArray()[0], letters);
+                bool found = false;
+
+                foreach (char letter in letters)
+                {
+                    if (letter.ToString() == guess.guess) found = true;
+                }
+
+                guess.correct = found;
             }
             await _gameStateRepository.MakeGuess(guess, token);
 
@@ -112,7 +119,7 @@ namespace Hangman.Application.Services
             {
                 state = "lost";
             }
-            if((guess.guess .Length > 1 && guess.correct) || (guessesNeeded - correctGuesses) < 1)
+            if((guess.guess.Length > 1 && guess.correct) || (guessesNeeded - correctGuesses) < 1)
             {
                 state = "won";
             }
@@ -123,31 +130,11 @@ namespace Hangman.Application.Services
             return guess;
         }
 
-        public bool searchLetter(char guessLetter, char[] letters)
-        {
-            bool found = false;
-
-            foreach (char letter in letters)
-            {
-                if(letter == guessLetter) found = true;
-            }
-            return found;
-        }
-
         public async Task<RoundStatus> GetRoundStatus(RoundStatus status, CancellationToken token = default)
         {
             var userGameCode = await _userRepository.GetUserGame(status.userId);
             await _roundStatusValidator.ValidateAndThrowAsync(status, token);
             if (userGameCode != status.roomCode) throw new Exception("401;Unauthorized");
-
-            // Finding out if the round even exsists (quick and dirty version)
-/*            try
-            {
-                status.word = await _gameStateRepository.GetWord(status.roomCode, status.roundNum, token);
-            } catch(InvalidOperationException)
-            {
-                throw new Exception("404;Round not found");
-            }*/
             
             status.status = await _gameStateRepository.GetRoundState(status.roomCode, status.roundNum, token);
             if(status.status == "inactive")
