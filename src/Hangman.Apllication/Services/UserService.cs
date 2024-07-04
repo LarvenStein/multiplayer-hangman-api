@@ -32,7 +32,7 @@ namespace Hangman.Application.Services
         public async Task<bool> IsUserInGame(string roomCode, Guid userId)
         {
             var userGameId = await _userRepository.GetUserGame(userId);
-            return (userGameId is not null && userGameId != roomCode);
+            return (userGameId is not null && userGameId == roomCode);
         }
     }
 }
