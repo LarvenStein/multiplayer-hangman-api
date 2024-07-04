@@ -147,6 +147,7 @@ namespace Hangman.Application.Tests.Unit
         [InlineData("thisgameisawsome", "word", 3, 1, false, "active")]
         [InlineData("ding", "word", 10, 3, false, "lost")]
         [InlineData("word", "word", 0, 3, true, "won")]
+        [InlineData("a", "(a)", 0, 3, true, "won")]
         public async Task HandleGuess_ShouldBeCheckedAndSaved_WhenRoundIsActive(string guess, string word, int falseGuesses, int correctGuesses, bool correct, string roundState)
         {
             // Arrange 
@@ -255,6 +256,8 @@ namespace Hangman.Application.Tests.Unit
         [InlineData("a", 1, "won", new string[] {  }, new string[] { "a" }, new char[] { 'a' })]
         [InlineData("a", 1, "lost", new string[] { "a", "b", "c", "e", "f", "g", "h", "i", "k", "l" }, new string[] {  }, new char[] { 'a' })]
         [InlineData("word", 1, "won", new string[] { "a", "b" }, new string[] { "word" }, new char[] { 'w', 'o', 'r', 'd' })]
+        [InlineData("spa_ce", 1, "won", new string[] { "d", "b" }, new string[] { "s", "p", "a", "c", "e" }, new char[] { 's', 'p', 'a', '_', 'c', 'e' })]
+
         public async Task GetRoundStatus_ShouldReturnRoundState_WhenEverythingValid(string word, int roundNum, string roundState, string[] incorrectGuesses, string[] correctGuesses, char[] guessedWord )
         {
             // Arrange
