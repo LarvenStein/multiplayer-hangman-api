@@ -246,5 +246,133 @@ namespace Hangman.Application.Tests.Unit
             await handleGuess.Should()
                 .ThrowAsync<ValidationException>();
         }
+
+        [Theory]
+        [InlineData("word", 1, "active",  new string[] {"a", "b"}, new string[] { "w", "d" }, new char[] {'w', '_', '_', 'd' })]
+        [InlineData("word", 1, "won", new string[] { "a", "b" }, new string[] { "w", "d", "r", "o" }, new char[] { 'w', 'o', 'r', 'd' })]
+        [InlineData("word", 1, "lost", new string[] { "a", "b", "c", "e", "f", "g", "h", "i", "k", "l" }, new string[] { "w", "d" }, new char[] { 'w', 'o', 'r', 'd' })]
+        [InlineData("a", 1, "active", new string[] { "x", "y" }, new string[] { }, new char[] { '_' })]
+        [InlineData("a", 1, "won", new string[] {  }, new string[] { "a" }, new char[] { 'a' })]
+        [InlineData("a", 1, "lost", new string[] { "a", "b", "c", "e", "f", "g", "h", "i", "k", "l" }, new string[] {  }, new char[] { 'a' })]
+        [InlineData("word", 1, "won", new string[] { "a", "b" }, new string[] { "word" }, new char[] { 'w', 'o', 'r', 'd' })]
+        public async Task GetRoundStatus_ShouldReturnRoundState_WhenEverythingValid(string word, int roundNum, string roundState, string[] incorrectGuesses, string[] correctGuesses, char[] guessedWord )
+        {
+            // Arrange
+            string roomCode = "AAAAAA";
+            Guid guid = Guid.NewGuid();
+            _userRepository.GetUserGame(guid).Returns(roomCode);
+            _gameStateRepository.GetWord(roomCode, Arg.Any<int>()).Returns(word);
+            _gameStateRepository.GetRoundState(roomCode, roundNum).Returns(roundState);
+            _gameStateRepository.CountIncorrectGuesses(Arg.Any<Guess>()).Returns(incorrectGuesses.Length);
+            _gameStateRepository.CountCorrectGuesses(Arg.Any<Guess>()).Returns(correctGuesses.Length);
+            _gameStateRepository.GetWrongGuesses(roomCode, Arg.Any<int>()).Returns(incorrectGuesses);
+            _gameStateRepository.GuessExsists(Arg.Any<Guess>()).Returns(args => correctGuesses.Contains(((Guess)args[0]).guess));
+            RoundStatus statusObject = new RoundStatus { roomCode = roomCode, roundNum =  roundNum, userId = guid};
+            RoundStatus expectedObject = new RoundStatus { 
+                correctGuesses = correctGuesses.Length, 
+                falseGuesses = incorrectGuesses.Length, 
+                livesLeft = GameConstants.maxGuesses - incorrectGuesses.Length, 
+                roomCode = roomCode,
+                roundNum = roundNum,  
+                status = roundState, 
+                word = word, 
+                userId = guid, 
+                wrongLetters = incorrectGuesses, 
+                guessedWord = guessedWord.ToList(),
+            };
+
+            // Act
+            var roundStatus = await _sut.GetRoundStatus(statusObject);
+
+            // Assert
+            roundStatus.Should()
+                .BeEquivalentTo(expectedObject);
+        }
+
+        [Fact]
+        public async Task GetRoundStatus_ShouldThrowError_WhenPlayerNotInRound()
+        {
+            // Arrange
+            RoundStatus statusObject = new RoundStatus { roomCode = "AAAAAA", roundNum = 1, userId = Guid.NewGuid() };
+
+            _userRepository.GetUserGame(statusObject.userId).Returns("BBBBBB");
+            _gameStateRepository.GetRoundState(statusObject.roomCode, statusObject.roundNum).Returns("active");
+
+            // Act
+            Func<Task> roundStatus = async () => { await _sut.GetRoundStatus(statusObject); };
+
+            // Assert
+            await roundStatus.Should()
+                .ThrowAsync<Exception>()
+                .WithMessage("401;Unauthorized");
+        }
+
+        [Fact]
+        public async Task GetRoundStatus_ShouldThrowError_WhenRoundInactive()
+        {
+            // Arrange
+            RoundStatus statusObject = new RoundStatus { roomCode = "AAAAAA", roundNum = 1, userId = Guid.NewGuid() };
+
+            _userRepository.GetUserGame(statusObject.userId).Returns(statusObject.roomCode);
+            _gameStateRepository.GetRoundState(statusObject.roomCode, statusObject.roundNum).Returns("inactive");
+
+            // Act
+            Func<Task> roundStatus = async () => { await _sut.GetRoundStatus(statusObject); };
+
+            // Assert
+            await roundStatus.Should()
+                .ThrowAsync<Exception>()
+                .WithMessage("404;Round not found");
+        }
+
+        [Theory]
+        [InlineData(1, "word", 1, "active", new string[] { "a", "b" }, new string[] { "w", "d" }, new char[] { 'w', '_', '_', 'd' })]
+        [InlineData(2, "word", 1, "won", new string[] { "a", "b" }, new string[] { "w", "d", "r", "o" }, new char[] { 'w', 'o', 'r', 'd' })]
+        [InlineData(3, "word", 1, "lost", new string[] { "a", "b", "c", "e", "f", "g", "h", "i", "k", "l" }, new string[] { "w", "d" }, new char[] { 'w', 'o', 'r', 'd' })]
+        [InlineData(4, "a", 1, "active", new string[] { "x", "y" }, new string[] { }, new char[] { '_' })]
+        [InlineData(5, "a", 1, "won", new string[] { }, new string[] { "a" }, new char[] { 'a' })]
+        [InlineData(6, "a", 1, "lost", new string[] { "a", "b", "c", "e", "f", "g", "h", "i", "k", "l" }, new string[] { }, new char[] { 'a' })]
+        [InlineData(7, "word", 1, "won", new string[] { "a", "b" }, new string[] { "word" }, new char[] { 'w', 'o', 'r', 'd' })]
+        public async Task GetRoundsStatus_ShouldReturnRoundsStates_WhenEverythingValid(int currentRound, string word, int roundNum, string roundState, string[] incorrectGuesses, string[] correctGuesses, char[] guessedWord)
+        {
+            // Arrange
+            string roomCode = "AAAAAA";
+            Guid guid = Guid.NewGuid();
+            _userRepository.GetUserGame(guid).Returns(roomCode);
+            _gameStateRepository.GetWord(roomCode, Arg.Any<int>()).Returns(word);
+            _gameStateRepository.GetRoundState(roomCode, Arg.Any<int>()).Returns(roundState);
+            _gameStateRepository.CountIncorrectGuesses(Arg.Any<Guess>()).Returns(incorrectGuesses.Length);
+            _gameStateRepository.CountCorrectGuesses(Arg.Any<Guess>()).Returns(correctGuesses.Length);
+            _gameStateRepository.GetWrongGuesses(roomCode, Arg.Any<int>()).Returns(incorrectGuesses);
+            _gameStateRepository.GuessExsists(Arg.Any<Guess>()).Returns(args => correctGuesses.Contains(((Guess)args[0]).guess));
+            _gameStateRepository.GetCurrentRound(roomCode).Returns(currentRound);
+            RoundStatus statusObject = new RoundStatus { roomCode = roomCode, roundNum = roundNum, userId = guid };
+            List<RoundStatus> expectedResult = new List<RoundStatus>();
+            for (int i = 1; i <= currentRound; i++)
+            {
+                RoundStatus expectedObject = new RoundStatus
+                {
+                    correctGuesses = correctGuesses.Length,
+                    falseGuesses = incorrectGuesses.Length,
+                    livesLeft = GameConstants.maxGuesses - incorrectGuesses.Length,
+                    roomCode = roomCode,
+                    roundNum = i,
+                    status = roundState,
+                    word = word,
+                    userId = guid,
+                    wrongLetters = incorrectGuesses,
+                    guessedWord = guessedWord.ToList(),
+                };
+
+                expectedResult.Add(expectedObject);
+            }
+
+            // Act
+            var roundStatus = await _sut.GetRoundsStatus(roomCode, guid);
+
+            // Assert
+            roundStatus.Should()
+                .BeEquivalentTo(expectedResult);
+        }
     }
 }

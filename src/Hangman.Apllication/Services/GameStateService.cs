@@ -135,15 +135,6 @@ namespace Hangman.Application.Services
             var userGameCode = await _userRepository.GetUserGame(status.userId);
             await _roundStatusValidator.ValidateAndThrowAsync(status, token);
             if (userGameCode != status.roomCode) throw new Exception("401;Unauthorized");
-
-            // Finding out if the round even exsists (quick and dirty version)
-/*            try
-            {
-                status.word = await _gameStateRepository.GetWord(status.roomCode, status.roundNum, token);
-            } catch(InvalidOperationException)
-            {
-                throw new Exception("404;Round not found");
-            }*/
             
             status.status = await _gameStateRepository.GetRoundState(status.roomCode, status.roundNum, token);
             if(status.status == "inactive")
