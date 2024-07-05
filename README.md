@@ -63,7 +63,7 @@ services:
 
 Afer that, you will need to add at least one word / wordlist for the game to work.
 
-If  you want to, you can use my 9 wordlists with ~ 2.2 million words by connecting to the database with a client and then importing [this sql file](http://example.com)
+If  you want to, you can use my 9 wordlists with ~ 2.2 million words by connecting to the database with a client and then importing [this sql file](https://media.eike.in/hangman-api/hangman.sql)
 
 ## 🕹️ Playing
 As this is a rest api, you can play this with any client you want like:
