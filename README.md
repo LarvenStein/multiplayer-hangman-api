@@ -1,6 +1,12 @@
 # Multiplayer hangman api
 A multiplayer hangman rest-api written in C# with .NET
 
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
+![Docker Image Version](https://img.shields.io/docker/v/LarvenStein/multiplayer-hangman-api)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/LarvenStein/multiplayer-hangman-api/.github%2Fworkflows%2Fdotnet.yml)
+![GitHub last commit](https://img.shields.io/github/last-commit/LarvenStein/multiplayer-hangman-api)
+
+
 ## 🔧 Installing
 Requierments:
 - Docker
