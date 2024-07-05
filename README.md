@@ -57,7 +57,7 @@ services:
 
 Afer that, you will need to add at least one word / wordlist for the game to work.
 
-If  you want to, you can use my 6 wordlists with ~ 2 million words by connecting to the database with a client and then importing [this sql file](http://example.com)
+If  you want to, you can use my 9 wordlists with ~ 2.2 million words by connecting to the database with a client and then importing [this sql file](http://example.com)
 
 ## 🕹️ Playing
 As this is a rest api, you can play this with any client you want like:
@@ -86,3 +86,17 @@ If you want to want to develop your own client or just play around with the api,
 I also made an insomnia collection with post request scripts and env vars, that you don't have to do everything by hand:
 
 [Insomnia collection](https://github.com/user-attachments/files/16066818/hangman-api_collection.json)
+
+### 📡 Signal R Hub (Websocket)
+If you want to have a more fluent game experience and do not want to poll an endpoint, you can use the signalR hub.
+
+Hub endpoint: `/api/hub`
+
+The hub provides functionality for things that would otherwise need to be polled.
+
+Here is a list of all the functionality:
+| **Name**  | **Arguments**                                                            | **Does**                                                                       | **Sends**                                                                                                                                                             |
+|-----------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| JoinGame  | (string) roomCode<br>(string) nickname                                   | Creates user in specified game and associates the connectionId with that game. | **To:**<br>Sender<br>**Message:**<br>JoinGame Response (same as the API)<hr>**To:**<br>Current game<br>**Message:**<br>List of players (same as get players endpoint) |
+| StartGame | (string) roomCode<br>(Guid) userId                                       | Starts the game, if user is game leader                                        | **To:**<br>Curent game<br>**Message:**<br>`{"roundId": int}`                                                                                                          |
+| MakeGuess | (string) userId<br>(string) guess<br>(string) roomCode<br>(string) round | Submits a guess                                                                | **To:**<br>Current game<br>**Message**<br>RoundStatus (same as get round status endpoint)                                                                             |

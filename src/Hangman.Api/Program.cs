@@ -6,10 +6,7 @@ using Hangman.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSignalR(options =>
-{
-    options.EnableDetailedErrors = true;
-});
+builder.Services.AddSignalR();
 
 builder.Configuration.AddJsonFile("databasesettings.json");
 

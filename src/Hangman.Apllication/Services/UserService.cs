@@ -11,10 +11,12 @@ namespace Hangman.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IGameReopsitory _gameReopsitory;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IGameReopsitory gameReopsitory)
         {
             _userRepository = userRepository;
+            _gameReopsitory = gameReopsitory;
         }
 
         public async Task<bool> IsUserGameLeader(GameSettings gameSettings, Guid userId, CancellationToken token = default)
@@ -33,6 +35,25 @@ namespace Hangman.Application.Services
         {
             var userGameId = await _userRepository.GetUserGame(userId);
             return (userGameId is not null && userGameId == roomCode);
+        }
+
+        public async Task RemovePlayer(string roomCode, Guid userId)
+        {
+            bool wasUserGameLeader = await IsUserGameLeader(roomCode, userId);
+
+            await _userRepository.DeletePlayer(userId);
+            var playerList = await _gameReopsitory.GetAllPlayers(roomCode);
+
+            if (playerList.Count() < 1)
+            {
+                await _gameReopsitory.DeleteGame(roomCode);
+                return;
+            }
+
+            if(wasUserGameLeader)
+            {
+                await _gameReopsitory.NewGameLeader(roomCode);
+            }
         }
     }
 }

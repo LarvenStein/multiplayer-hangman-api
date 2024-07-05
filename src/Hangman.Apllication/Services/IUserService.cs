@@ -12,5 +12,6 @@ namespace Hangman.Application.Services
         Task<bool> IsUserGameLeader(GameSettings gameSettings, Guid userId, CancellationToken token = default);
         Task<bool> IsUserGameLeader(String roomCode, Guid userId, CancellationToken token = default);
         Task<bool> IsUserInGame(String roomCode, Guid userId);
+        Task RemovePlayer(String roomCode, Guid userId);
     }
 }
