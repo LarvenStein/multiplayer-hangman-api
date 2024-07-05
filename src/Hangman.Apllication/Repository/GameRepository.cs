@@ -106,5 +106,35 @@ namespace Hangman.Application.Repository
 
             return result < 0;
         }
+
+        public async Task DeleteGame(string roomCode)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+
+            var result = await connection.ExecuteAsync(new CommandDefinition("""
+                DELETE FROM Game
+                WHERE RoomCode = (@roomCode);
+                
+                DELETE FROM Guess
+                WHERE RoomCode = (@roomCode);
+
+                DELETE FROM Round
+                WHERE RoomCode = (@roomCode);
+                """, new { roomCode }));
+        }
+
+        public async Task NewGameLeader(string roomCode)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+
+            var result = await connection.ExecuteAsync(new CommandDefinition("""
+                UPDATE Game
+                SET GameLeader = (SELECT Playerid
+                                   FROM Player
+                                   WHERE RoomCode = (@roomCode)
+                                   LIMIT 1)
+                WHERE RoomCode = (@roomCode)
+                """, new { roomCode }));
+        }
     }
 }

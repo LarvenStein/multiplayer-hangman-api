@@ -12,5 +12,6 @@ namespace Hangman.Application.Repository
         Task<bool> SetGameLeader(Player player, CancellationToken cancellationToken = default);
         Task<Guid?> GetGameLeader(String gameCode, CancellationToken cancellationToken = default);
         Task<string?> GetUserGame(Guid userId);
+        Task DeletePlayer(Guid userId);
     }
 }

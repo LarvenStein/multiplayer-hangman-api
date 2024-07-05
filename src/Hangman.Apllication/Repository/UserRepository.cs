@@ -4,6 +4,7 @@ using Hangman.Application.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,16 @@ namespace Hangman.Application.Repository
         public UserRepository(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
+        }
+
+        public async Task DeletePlayer(Guid userId)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+            var result = await connection.ExecuteAsync(new CommandDefinition("""
+                DELETE FROM Player
+                WHERE PlayerId = (@userId)
+                """, new {userId}));
+
         }
 
         public async Task<Guid?> GetGameLeader(string gameCode, CancellationToken cancellationToken = default)

@@ -16,5 +16,7 @@ namespace Hangman.Application.Repository
         Task<IEnumerable<Wordlist>> GetWordlists(CancellationToken token = default);
         Task<IEnumerable<string>> GetRandomWord(int wordList, int words);
         Task<bool> CreateRound(string roomCode, string word, int roundNum,  CancellationToken token = default);
+        Task DeleteGame(string roomCode);
+        Task NewGameLeader(string roomCode);
     }
 }

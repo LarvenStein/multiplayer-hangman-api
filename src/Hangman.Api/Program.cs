@@ -2,9 +2,14 @@ using Hangman.Application;
 using Hangman.Application.Database;
 using Hangman.Api.Endpoints;
 using Hangman.Api.Mapping;
+using Hangman.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
-//builder.Configuration.AddJsonFile("databasesettings.json");
+
+builder.Services.AddSignalR();
+
+builder.Configuration.AddJsonFile("databasesettings.json");
+
 var config = builder.Configuration;
 
 builder.Services.AddCors();
@@ -51,6 +56,8 @@ app.UseOutputCache();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
 //app.MapControllers();
+app.MapHub<GameHub>("/api/hub");
+
 
 var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
 await dbInitializer.InitializeAsync();
