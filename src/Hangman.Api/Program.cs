@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSignalR();
 
-builder.Configuration.AddJsonFile("databasesettings.json");
+//builder.Configuration.AddJsonFile("databasesettings.json");
 
 var config = builder.Configuration;
 
