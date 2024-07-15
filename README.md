@@ -68,7 +68,7 @@ If  you want to, you can use my 9 wordlists with ~ 2.2 million words by connecti
 ## 🕹️ Playing
 As this is a rest api, you can play this with any client you want like:
 - My own frontend written in svelte
-  - [Play it](http://example.com)
+  - [Play it](http://hangman.eike.in/)
   - [GitHub repo](https://github.com/LarvenStein/multiplayer-hangman-frontend)
 - Using a tool like insomnia or postman
 - Using a client that you developed yourself
